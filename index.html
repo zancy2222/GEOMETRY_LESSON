@@ -47,12 +47,17 @@
             margin: 20px 0;
             text-align: center;
             position: relative;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            background: #fff;
+            padding: 10px;
         }
 
         canvas {
             border: 1px solid #ccc;
             background-color: white;
             margin: 10px 0;
+            cursor: crosshair;
         }
 
         .tools {
@@ -60,33 +65,55 @@
             justify-content: center;
             gap: 10px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         button {
-            padding: 8px 15px;
+            padding: 10px 20px;
             background-color: #3498db;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 1em;
+            position: relative;
+            transition: all 0.3s ease;
         }
 
         button:hover {
             background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            z-index: 10;
         }
 
         .active-tool {
             background-color: #2c3e50;
+            transform: scale(1.1);
         }
 
         .tool-active {
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         .instructions {
             font-style: italic;
             color: #7f8c8d;
-            margin-top: 5px;
+            margin-top: 10px;
+            text-align: center;
         }
 
         .protractor {
@@ -113,26 +140,15 @@
             transition: transform 0.1s;
         }
 
-        .compass {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: rgba(52, 152, 219, 0.5);
-            border-radius: 50%;
-            border: 2px solid #3498db;
-            pointer-events: none;
-            display: none;
-            z-index: 10;
-        }
-
         .center-handle {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: red;
+            width: 12px;
+            height: 12px;
+            background-color: #e74c3c;
             border-radius: 50%;
             z-index: 20;
             display: none;
+            cursor: move;
         }
 
         .header {
@@ -416,35 +432,6 @@
             margin-top: 20px;
         }
 
-        .construction-feedback {
-            background: #e9f7ef;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .construction-feedback.show {
-            display: block;
-        }
-
-        .construction-feedback.success {
-            border-left: 5px solid #4CAF50;
-        }
-
-        .construction-feedback.error {
-            border-left: 5px solid #f44336;
-        }
-
-        .construction-guide {
-            background: #f0f4f8;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #34495e;
-        }
-
         @media (max-width: 768px) {
             .lesson-selector {
                 flex-direction: column;
@@ -466,9 +453,13 @@
                 max-width: 200px;
             }
 
+            .canvas-container {
+                padding: 5px;
+            }
+
             canvas {
                 width: 100%;
-                height: 400px;
+                height: auto;
             }
         }
 
@@ -492,28 +483,28 @@
     <div class="container">
         <div class="header">
             <h1>🔺 Geomaster: An Interactive Website for Geometric Constructions</h1>
-            <p>Master Geometric Constructions with Interactive Tools</p>
+            <p>Master Triangle Construction & Perpendicular Bisectors with Interactive Tools</p>
         </div>
 
         <div class="tools">
-            <button id="pointer-btn">Pointer</button>
-            <button id="line-btn">Line</button>
-            <button id="point-btn">Point</button>
-            <button id="compass-btn">Compass</button>
-            <button id="protractor-btn">Protractor</button>
-            <button id="ruler-btn">Ruler</button>
-             <button id="clear-btn">Clear</button>
+            <button id="pointer-btn" data-tooltip="Select and move points/lines">Pointer</button>
+            <button id="line-btn" data-tooltip="Draw straight lines">Line</button>
+            <button id="point-btn" data-tooltip="Place labeled points">Point</button>
+            <button id="freehand-btn" data-tooltip="Draw freehand lines">Freehand</button>
+            <button id="protractor-btn" data-tooltip="Measure angles">Protractor</button>
+            <button id="ruler-btn" data-tooltip="Measure lengths">Ruler</button>
+            <button id="undo-btn" data-tooltip="Undo last action">Undo</button>
+            <button id="clear-btn" data-tooltip="Clear canvas">Clear</button>
         </div>
 
         <div class="canvas-container">
             <canvas id="construction-canvas" width="800" height="500"></canvas>
             <div class="protractor" id="protractor"></div>
             <div class="ruler" id="ruler"></div>
-            <div class="compass" id="compass"></div>
             <div class="center-handle" id="protractor-handle"></div>
             <div class="center-handle" id="ruler-handle"></div>
-            <div class="center-handle" id="compass-handle"></div>
-          </div>
+        </div>
+        <div class="instructions">Use the tools to construct geometric shapes. Press ESC to hide protractor/ruler.</div>
 
         <div class="lesson-selector">
             <button class="lesson-btn active" onclick="showLesson(1)">📐 Perpendicular Bisector</button>
@@ -522,19 +513,20 @@
         </div>
 
         <div class="content-area">
+            <!-- Lesson 1: Perpendicular Bisector -->
             <div id="lesson1" class="lesson-content active">
                 <h2 class="lesson-title">Perpendicular Bisector</h2>
                 <div class="procedure-section">
                     <h3>📋 Construction Procedure</h3>
-                    <p><strong>Goal:</strong> Construct a line that bisects segment AB at a 90° angle</p>
+                    <p><strong>Given:</strong> A line segment AB</p>
                     <ol class="steps">
-                        <li>Draw a line segment and label its endpoints as A and B.</li>
-                        <li>Use the compass tool to set a radius greater than half of AB's length.</li>
-                        <li>Place the compass at point A and draw two arcs (above and below the segment).</li>
-                        <li>Without changing the compass width, place it at point B and draw two arcs intersecting the previous arcs.</li>
-                        <li>Label the intersection points as X and Y.</li>
-                        <li>Draw a line through X and Y using the line tool. This is the perpendicular bisector.</li>
-                        <li>Click "Check Construction" to verify your work.</li>
+                        <li>Draw the given line segment using a ruler and label the endpoints as A and B.</li>
+                        <li>Place the compass at point A and open it to more than half of AB but less than its full length.</li>
+                        <li>Draw an arc above and below the line.</li>
+                        <li>Without changing the compass width, place it at point B and draw another arc above and below AB, ensuring these arcs intersect the first ones.</li>
+                        <li>Mark the points of intersection of the arcs and label them as X and Y.</li>
+                        <li>Draw a straight line through X and Y using a ruler. This line is the perpendicular bisector of AB.</li>
+                        <li>Verify the construction: The bisector should divide AB into two equal parts and form a 90° angle with AB at the midpoint.</li>
                     </ol>
                 </div>
                 <div class="activity-section">
@@ -548,37 +540,35 @@
                 </div>
             </div>
 
+            <!-- Lesson 2: Triangle Construction -->
             <div id="lesson2" class="lesson-content">
                 <h2 class="lesson-title">Triangle Construction (SSS, SAS, ASA)</h2>
                 <div class="procedure-section">
                     <h3>📋 SSS (Side-Side-Side) Construction</h3>
                     <ol class="steps">
-                        <li>Draw the longest side using the ruler and label it AB.</li>
-                        <li>Set the compass to the second side length, place it at A, and draw an arc.</li>
-                        <li>Set the compass to the third side length, place it at B, and draw an arc intersecting the first arc.</li>
-                        <li>Label the intersection as C.</li>
-                        <li>Connect A, B, and C using the line tool.</li>
-                        <li>Click "Check Construction" to verify.</li>
+                        <li>Draw the longest given side as the base using a ruler and label it AB.</li>
+                        <li>Set the compass to the length of the second side, place it at A, and draw an arc.</li>
+                        <li>Set the compass to the length of the third side, place it at B, and draw another arc that intersects the first arc.</li>
+                        <li>Mark the intersection point as C. This is the third vertex of the triangle.</li>
+                        <li>Connect points A, B, and C using a ruler to complete the triangle.</li>
                     </ol>
                 </div>
                 <div class="procedure-section">
                     <h3>📋 SAS (Side-Angle-Side) Construction</h3>
                     <ol class="steps">
-                        <li>Draw a side using the ruler and label it AB.</li>
-                        <li>Use the protractor at A to mark the given angle and draw a ray.</li>
-                        <li>Set the compass to the second side length, place it at A, and mark a point on the ray (C).</li>
-                        <li>Connect C to B using the line tool.</li>
-                        <li>Click "Check Construction" to verify.</li>
+                        <li>Draw the given side as the base using a ruler and label it AB.</li>
+                        <li>Use a protractor at A to mark the given angle and draw a ray extending outward.</li>
+                        <li>Set the compass to the length of the second given side, place it at A, and mark the second side's length on the ray.</li>
+                        <li>Connect the new point to B to complete the triangle.</li>
                     </ol>
                 </div>
                 <div class="procedure-section">
                     <h3>📋 ASA (Angle-Side-Angle) Construction</h3>
                     <ol class="steps">
-                        <li>Draw a side using the ruler and label it AB.</li>
-                        <li>Use the protractor at A and B to mark the given angles and draw rays.</li>
-                        <li>Label the rays' intersection as C.</li>
-                        <li>Connect A, B, and C using the line tool.</li>
-                        <li>Click "Check Construction" to verify.</li>
+                        <li>Draw the given side as the base using a ruler and label it AB.</li>
+                        <li>Use a protractor at A and B to mark the given angles and draw rays extending from these angles.</li>
+                        <li>Find the intersection of the two rays and mark it as C.</li>
+                        <li>Connect points A, B, and C using a ruler to complete the triangle.</li>
                     </ol>
                 </div>
                 <div class="activity-section">
@@ -592,18 +582,19 @@
                 </div>
             </div>
 
+            <!-- Lesson 3: Triangle from Side Lengths -->
             <div id="lesson3" class="lesson-content">
                 <h2 class="lesson-title">Constructing a Triangle Given Its Side Lengths</h2>
                 <div class="procedure-section">
                     <h3>📋 Construction Procedure</h3>
-                    <p><strong>Given:</strong> Three side lengths (e.g., 6cm, 8cm, 10cm)</p>
+                    <p><strong>Given:</strong> Three side lengths</p>
                     <ol class="steps">
-                        <li>Draw the longest side using the ruler and label it AB.</li>
+                        <li>Draw the longest side first using a ruler and label it AB.</li>
                         <li>Set the compass to the second side length, place it at A, and draw an arc.</li>
-                        <li>Set the compass to the third side length, place it at B, and draw an arc intersecting the first arc.</li>
-                        <li>Label the intersection as C.</li>
-                        <li>Connect A, B, and C using the line tool.</li>
-                        <li>Click "Check Construction" to verify.</li>
+                        <li>Set the compass to the third side length, place it at B, and draw another arc.</li>
+                        <li>Mark the intersection of the arcs and label it as C.</li>
+                        <li>Connect points A, B, and C using a ruler to complete the triangle.</li>
+                        <li>Check if the triangle satisfies the triangle inequality theorem: the sum of any two sides must be greater than the third side.</li>
                     </ol>
                 </div>
                 <div class="activity-section">
@@ -614,7 +605,7 @@
                         <li>a + c > b</li>
                         <li>b + c > a</li>
                     </ul>
-                    <p>If any condition fails, the triangle cannot be constructed.</p>
+                    <p>If any of these conditions are not met, the triangle cannot be constructed.</p>
                 </div>
             </div>
         </div>
@@ -622,7 +613,7 @@
         <div class="quiz-section">
             <div class="quiz-header">
                 <h2>🎮 Interactive Quiz Game</h2>
-                <p>Test your geometry knowledge with engaging quizzes!</p>
+                <p>Test your knowledge with shuffled questions!</p>
             </div>
             <div class="quiz-controls">
                 <button class="quiz-btn" onclick="startQuiz(1)">Quiz: Perpendicular Bisector</button>
@@ -644,7 +635,7 @@
     </div>
 
     <script>
-        // Question data (unchanged)
+        // Question data
         const questions = {
             1: [
                 {
@@ -960,11 +951,9 @@
         let score = 0;
         let selectedAnswer = null;
         let quizActive = false;
-        let currentLesson = 1;
 
         // Show lesson function
         function showLesson(lessonNum) {
-            currentLesson = lessonNum;
             document.querySelectorAll('.lesson-content').forEach(lesson => {
                 lesson.classList.remove('active');
             });
@@ -976,8 +965,6 @@
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('final-score').style.display = 'none';
             quizActive = false;
-            clearCanvas();
-            updateGuide();
         }
 
         // Shuffle array function
@@ -992,7 +979,7 @@
 
         // Start quiz function
         function startQuiz(lessonNum) {
-            currentQuiz = shuffleArray(questions[lessonNum]).slice(0, 10);
+            currentQuiz = shuffleArray(questions[lessonNum]);
             currentQuestionIndex = 0;
             score = 0;
             selectedAnswer = null;
@@ -1005,7 +992,7 @@
         // Start mixed quiz function
         function startMixedQuiz() {
             const allQuestions = [...questions[1], ...questions[2], ...questions[3]];
-            currentQuiz = shuffleArray(allQuestions).slice(0, 15);
+            currentQuiz = shuffleArray(allQuestions).slice(0, 20);
             currentQuestionIndex = 0;
             score = 0;
             selectedAnswer = null;
@@ -1064,7 +1051,7 @@
                 if (quizActive) {
                     nextQuestion();
                 }
-            }, 1500);
+            }, 2000);
         }
 
         // Next question function
@@ -1080,19 +1067,19 @@
             let message = '';
             let emoji = '';
             if (percentage >= 90) {
-                message = 'Outstanding! You are a geometry master!';
+                message = 'Excellent! You have mastered the concepts!';
                 emoji = '🏆';
             } else if (percentage >= 80) {
-                message = 'Great job! You have a strong grasp of the concepts!';
+                message = 'Great job! You have a solid understanding!';
                 emoji = '🎉';
             } else if (percentage >= 70) {
-                message = 'Good effort! Keep practicing to excel!';
+                message = 'Good work! Keep practicing to improve!';
                 emoji = '👍';
             } else if (percentage >= 60) {
-                message = 'Nice try! Review the lessons to improve!';
+                message = 'Fair effort! Review the lessons and try again!';
                 emoji = '📚';
             } else {
-                message = 'Keep practicing! You will get there!';
+                message = 'Keep studying! Practice makes perfect!';
                 emoji = '💪';
             }
             document.getElementById('final-score').innerHTML = `
@@ -1109,44 +1096,54 @@
             quizActive = false;
         }
 
-        // Canvas and construction logic
+        // Initialize the page
+        document.addEventListener(' anna', function () {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            });
+            document.querySelectorAll('.procedure-section, .activity-section').forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             const canvas = document.getElementById('construction-canvas');
             const ctx = canvas.getContext('2d');
             const protractor = document.getElementById('protractor');
             const ruler = document.getElementById('ruler');
-            const compass = document.getElementById('compass');
             const protractorHandle = document.getElementById('protractor-handle');
             const rulerHandle = document.getElementById('ruler-handle');
-            const compassHandle = document.getElementById('compass-handle');
-            const feedback = document.getElementById('feedback');
-            const guide = document.getElementById('guide');
 
             let currentTool = 'pointer';
             let isDrawing = false;
             let startX, startY;
             let points = [];
             let lines = [];
-            let arcs = [];
+            let freehandPaths = [];
             let currentLine = null;
+            let currentFreehandPath = null;
             let draggedElement = null;
             let protractorVisible = false;
             let rulerVisible = false;
-            let compassVisible = false;
             let protractorAngle = 0;
             let rulerAngle = 0;
-            let compassRadius = 50;
             let isRotating = false;
-            let constructionStep = 0;
+            let actionHistory = [];
 
             // Tool buttons
             document.getElementById('pointer-btn').addEventListener('click', () => setTool('pointer'));
             document.getElementById('line-btn').addEventListener('click', () => setTool('line'));
             document.getElementById('point-btn').addEventListener('click', () => setTool('point'));
-            document.getElementById('compass-btn').addEventListener('click', toggleCompass);
+            document.getElementById('freehand-btn').addEventListener('click', () => setTool('freehand'));
             document.getElementById('protractor-btn').addEventListener('click', toggleProtractor);
             document.getElementById('ruler-btn').addEventListener('click', toggleRuler);
-             document.getElementById('clear-btn').addEventListener('click', clearCanvas);
+            document.getElementById('undo-btn').addEventListener('click', undoAction);
+            document.getElementById('clear-btn').addEventListener('click', clearCanvas);
 
             function setTool(tool) {
                 currentTool = tool;
@@ -1157,8 +1154,7 @@
                 document.getElementById(`${tool}-btn`).classList.add('active-tool');
                 protractorHandle.style.display = 'none';
                 rulerHandle.style.display = 'none';
-                compassHandle.style.display = 'none';
-                updateGuide();
+                canvas.style.cursor = tool === 'freehand' ? 'crosshair' : tool === 'point' ? 'crosshair' : tool === 'line' ? 'crosshair' : 'default';
             }
 
             function toggleProtractor() {
@@ -1177,7 +1173,6 @@
                 } else {
                     setTool('pointer');
                 }
-                updateGuide();
             }
 
             function toggleRuler() {
@@ -1196,101 +1191,59 @@
                 } else {
                     setTool('pointer');
                 }
-                updateGuide();
-            }
-
-            function toggleCompass() {
-                compassVisible = !compassVisible;
-                compass.style.display = compassVisible ? 'block' : 'none';
-                document.getElementById('compass-btn').classList.toggle('tool-active', compassVisible);
-                if (compassVisible) {
-                    setTool('compass');
-                    if (!compass.style.left) {
-                        const rect = canvas.getBoundingClientRect();
-                        compass.style.left = `${rect.width / 2 - 10}px`;
-                        compass.style.top = `${rect.height / 2 - 10}px`;
-                    }
-                    updateCompassHandlePosition();
-                    compassHandle.style.display = 'block';
-                } else {
-                    setTool('pointer');
-                }
-                updateGuide();
             }
 
             function updateProtractorHandlePosition() {
                 const protractorRect = protractor.getBoundingClientRect();
                 const canvasRect = canvas.getBoundingClientRect();
-                protractorHandle.style.left = `${protractorRect.left + protractorRect.width / 2 - canvasRect.left - 5}px`;
-                protractorHandle.style.top = `${protractorRect.top + protractorRect.height / 2 - canvasRect.top - 5}px`;
+                protractorHandle.style.left = `${protractorRect.left + protractorRect.width / 2 - canvasRect.left - 6}px`;
+                protractorHandle.style.top = `${protractorRect.top + protractorRect.height / 2 - canvasRect.top - 6}px`;
             }
 
             function updateRulerHandlePosition() {
                 const rulerRect = ruler.getBoundingClientRect();
                 const canvasRect = canvas.getBoundingClientRect();
-                rulerHandle.style.left = `${rulerRect.left + rulerRect.width / 2 - canvasRect.left - 5}px`;
-                rulerHandle.style.top = `${rulerRect.top + rulerRect.height / 2 - canvasRect.top - 5}px`;
-            }
-
-            function updateCompassHandlePosition() {
-                const compassRect = compass.getBoundingClientRect();
-                const canvasRect = canvas.getBoundingClientRect();
-                compassHandle.style.left = `${compassRect.left + compassRect.width / 2 - canvasRect.left - 5}px`;
-                compassHandle.style.top = `${compassRect.top + compassRect.height / 2 - canvasRect.top - 5}px`;
-            }
-
-            function updateGuide() {
-                const guides = {
-                    1: [
-                        "Draw a line segment using the line tool and label its endpoints as A and B.",
-                        "Select the compass tool and set its radius to more than half the length of AB.",
-                        "Place the compass at point A and draw two arcs (above and below).",
-                        "Keep the compass radius, place it at point B, and draw two intersecting arcs.",
-                        "Label the intersection points as X and Y.",
-                        "Draw a line through X and Y using the line tool.",
-                        "Click 'Check Construction' to verify."
-                    ],
-                    2: [
-                        "For SSS: Draw the longest side with the ruler and label it AB.",
-                        "Set the compass to the second side length and draw an arc from A.",
-                        "Set the compass to the third side length and draw an arc from B.",
-                        "Label the intersection as C and connect A, B, C with the line tool.",
-                        "For SAS: Draw a side, use the protractor at A for the angle, mark the second side with the compass, and connect.",
-                        "For ASA: Draw a side, use the protractor at A and B for angles, find the rays' intersection as C, and connect."
-                    ],
-                    3: [
-                        "Draw the longest side using the ruler and label it AB.",
-                        "Set the compass to the second side length and draw an arc from A.",
-                        "Set the compass to the third side length and draw an arc from B.",
-                        "Label the intersection as C and connect A, B, C with the line tool.",
-                        "Click 'Check Construction' to verify."
-                    ]
-                };
-                guide.innerHTML = `<strong>Step ${constructionStep + 1}:</strong> ${guides[currentLesson][constructionStep] || "Follow the procedure steps."}`;
+                rulerHandle.style.left = `${rulerRect.left + rulerRect.width / 2 - canvasRect.left - 6}px`;
+                rulerHandle.style.top = `${rulerRect.top + rulerRect.height / 2 - canvasRect.top - 6}px`;
             }
 
             function clearCanvas() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 points = [];
                 lines = [];
-                arcs = [];
+                freehandPaths = [];
                 currentLine = null;
-                constructionStep = 0;
-                feedback.classList.remove('show', 'success', 'error');
-                feedback.innerHTML = '';
-                updateGuide();
+                currentFreehandPath = null;
+                actionHistory = [];
+                redrawCanvas();
+            }
+
+            function undoAction() {
+                const action = actionHistory.pop();
+                if (action) {
+                    if (action.type === 'point') {
+                        points.pop();
+                    } else if (action.type === 'line') {
+                        lines.pop();
+                    } else if (action.type === 'freehand') {
+                        freehandPaths.pop();
+                    }
+                    redrawCanvas();
+                }
             }
 
             function drawPoint(x, y, label = '') {
                 ctx.beginPath();
-                ctx.arc(x, y, 3, 0, Math.PI * 2);
-                ctx.fillStyle = 'red';
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#e74c3c';
                 ctx.fill();
+                ctx.strokeStyle = '#2c3e50';
+                ctx.lineWidth = 1;
                 ctx.stroke();
                 if (label) {
-                    ctx.font = '12px Arial';
-                    ctx.fillStyle = 'black';
-                    ctx.fillText(label, x + 8, y + 3);
+                    ctx.font = '14px Arial';
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillText(label, x + 10, y + 5);
                 }
             }
 
@@ -1298,26 +1251,33 @@
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
-                ctx.strokeStyle = 'blue';
+                ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 2;
                 ctx.stroke();
             }
 
-            function drawArc(x, y, radius, startAngle = 0, endAngle = Math.PI * 2) {
+            function drawFreehandPath(path) {
+                if (path.points.length < 2) return;
                 ctx.beginPath();
-                ctx.arc(x, y, radius, startAngle, endAngle);
-                ctx.strokeStyle = 'green';
-                ctx.lineWidth = 1;
+                ctx.moveTo(path.points[0].x, path.points[0].y);
+                for (let i = 1; i < path.points.length; i++) {
+                    ctx.lineTo(path.points[i].x, path.points[i].y);
+                }
+                ctx.strokeStyle = '#2c3e50';
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
             }
 
             function redrawCanvas() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 lines.forEach(line => drawLine(line.x1, line.y1, line.x2, line.y2));
-                arcs.forEach(arc => drawArc(arc.x, arc.y, arc.radius));
+                freehandPaths.forEach(path => drawFreehandPath(path));
                 points.forEach(point => drawPoint(point.x, point.y, point.label));
                 if (currentLine) {
                     drawLine(currentLine.x1, currentLine.y1, currentLine.x2, currentLine.y2);
+                }
+                if (currentFreehandPath) {
+                    drawFreehandPath(currentFreehandPath);
                 }
             }
 
@@ -1327,6 +1287,17 @@
                     x: evt.clientX - rect.left,
                     y: evt.clientY - rect.top
                 };
+            }
+
+            function snapToPoint(x, y) {
+                for (let point of points) {
+                    const dx = x - point.x;
+                    const dy = y - point.y;
+                    if (Math.sqrt(dx * dx + dy * dy) < 10) {
+                        return { x: point.x, y: point.y };
+                    }
+                }
+                return { x, y };
             }
 
             function isPointNearLine(x, y, line) {
@@ -1362,62 +1333,10 @@
                 return Math.sqrt(dx * dx + dy * dy) < 10;
             }
 
-            function checkConstruction() {
-                feedback.classList.remove('success', 'error');
-                feedback.classList.add('show');
-                if (currentLesson === 1) {
-                    if (lines.length < 2 || points.length < 4) {
-                        feedback.classList.add('error');
-                        feedback.innerHTML = 'Incomplete construction. Ensure you have a segment AB, two intersection points X and Y, and a bisector line.';
-                        return;
-                    }
-                    const segment = lines[0];
-                    const bisector = lines[lines.length - 1];
-                    const midX = (segment.x1 + segment.x2) / 2;
-                    const midY = (segment.y1 + segment.y2) / 2;
-                    const isPerpendicular = Math.abs(
-                        ((bisector.x2 - bisector.x1) * (segment.x2 - segment.x1) +
-                        (bisector.y2 - bisector.y1) * (segment.y2 - segment.y1)) /
-                        (Math.sqrt((bisector.x2 - bisector.x1) ** 2 + (bisector.y2 - bisector.y1) ** 2) *
-                        Math.sqrt((segment.x2 - segment.x1) ** 2 + (segment.y2 - segment.y1) ** 2))
-                    ) < 0.1;
-                    const isMidpoint = isPointNearPoint(midX, midY, {
-                        x: (bisector.x1 + bisector.x2) / 2,
-                        y: (bisector.y1 + bisector.y2) / 2
-                    });
-                    if (isPerpendicular && isMidpoint) {
-                        feedback.classList.add('success');
-                        feedback.innerHTML = 'Correct! The bisector is perpendicular and passes through the midpoint.';
-                        constructionStep = guides[1].length - 1;
-                    } else {
-                        feedback.classList.add('error');
-                        feedback.innerHTML = 'Incorrect. Check that the bisector is perpendicular to AB and passes through its midpoint.';
-                    }
-                } else if (currentLesson === 2 || currentLesson === 3) {
-                    if (lines.length < 3 || points.length < 3) {
-                        feedback.classList.add('error');
-                        feedback.innerHTML = 'Incomplete triangle. Ensure you have three vertices (A, B, C) and three sides.';
-                        return;
-                    }
-                    const sides = lines.slice(-3);
-                    const lengths = sides.map(line => 
-                        Math.sqrt((line.x2 - line.x1) ** 2 + (line.y2 - line.y1) ** 2)
-                    );
-                    const [a, b, c] = lengths.sort((x, y) => x - y);
-                    if (a + b > c) {
-                        feedback.classList.add('success');
-                        feedback.innerHTML = 'Correct! The sides form a valid triangle.';
-                        constructionStep = guides[currentLesson].length - 1;
-                    } else {
-                        feedback.classList.add('error');
-                        feedback.innerHTML = 'Invalid triangle. Check the triangle inequality theorem.';
-                    }
-                }
-                updateGuide();
-            }
-
             canvas.addEventListener('mousedown', function (e) {
                 const mousePos = getMousePos(canvas, e);
+                const snappedPos = snapToPoint(mousePos.x, mousePos.y);
+
                 if (currentTool === 'pointer') {
                     for (let i = 0; i < lines.length; i++) {
                         if (isPointNearLine(mousePos.x, mousePos.y, lines[i])) {
@@ -1432,20 +1351,25 @@
                         }
                     }
                 }
+
                 if (currentTool === 'line') {
                     isDrawing = true;
-                    startX = mousePos.x;
-                    startY = mousePos.y;
+                    startX = snappedPos.x;
+                    startY = snappedPos.y;
                     currentLine = { x1: startX, y1: startY, x2: startX, y2: startY };
-                    constructionStep = Math.min(constructionStep + 1, guides[currentLesson].length - 1);
-                    updateGuide();
                 }
+
                 if (currentTool === 'point') {
-                    points.push({ x: mousePos.x, y: mousePos.y, label: String.fromCharCode(65 + points.length) });
+                    points.push({ x: snappedPos.x, y: snappedPos.y, label: String.fromCharCode(65 + points.length) });
+                    actionHistory.push({ type: 'point' });
                     redrawCanvas();
-                    constructionStep = Math.min(constructionStep + 1, guides[currentLesson].length - 1);
-                    updateGuide();
                 }
+
+                if (currentTool === 'freehand') {
+                    isDrawing = true;
+                    currentFreehandPath = { points: [{ x: snappedPos.x, y: snappedPos.y }] };
+                }
+
                 if (currentTool === 'protractor' && protractorVisible) {
                     const handleRect = protractorHandle.getBoundingClientRect();
                     const handleCenter = {
@@ -1461,8 +1385,8 @@
                             type: 'protractor-move',
                             startX: e.clientX,
                             startY: e.clientY,
-                            initialLeft: parseInt(protractor.style.left),
-                            initialTop: parseInt(protractor.style.top)
+                            initialLeft: parseFloat(protractor.style.left),
+                            initialTop: parseFloat(protractor.style.top)
                         };
                         isRotating = false;
                     } else {
@@ -1483,6 +1407,7 @@
                         isRotating = true;
                     }
                 }
+
                 if (currentTool === 'ruler' && rulerVisible) {
                     const handleRect = rulerHandle.getBoundingClientRect();
                     const handleCenter = {
@@ -1498,8 +1423,8 @@
                             type: 'ruler-move',
                             startX: e.clientX,
                             startY: e.clientY,
-                            initialLeft: parseInt(ruler.style.left),
-                            initialTop: parseInt(ruler.style.top)
+                            initialLeft: parseFloat(ruler.style.left),
+                            initialTop: parseFloat(ruler.style.top)
                         };
                         isRotating = false;
                     } else {
@@ -1520,49 +1445,12 @@
                         isRotating = true;
                     }
                 }
-                if (currentTool === 'compass' && compassVisible) {
-                    const handleRect = compassHandle.getBoundingClientRect();
-                    const handleCenter = {
-                        x: handleRect.left + handleRect.width / 2,
-                        y: handleRect.top + handleRect.height / 2
-                    };
-                    const distance = Math.sqrt(
-                        Math.pow(e.clientX - handleCenter.x, 2) +
-                        Math.pow(e.clientY - handleCenter.y, 2)
-                    );
-                    if (distance < 15) {
-                        draggedElement = {
-                            type: 'compass-move',
-                            startX: e.clientX,
-                            startY: e.clientY,
-                            initialLeft: parseInt(compass.style.left),
-                            initialTop: parseInt(compass.style.top)
-                        };
-                    } else {
-                        const compassRect = compass.getBoundingClientRect();
-                        const compassCenter = {
-                            x: compassRect.left + compassRect.width / 2,
-                            y: compassRect.top + compassRect.height / 2
-                        };
-                        compassRadius = Math.sqrt(
-                            Math.pow(e.clientX - compassCenter.x, 2) +
-                            Math.pow(e.clientY - compassCenter.y, 2)
-                        );
-                        compass.style.width = `${compassRadius * 2}px`;
-                        compass.style.height = `${compassRadius * 2}px`;
-                        compass.style.left = `${parseInt(compass.style.left) - (compassRadius - 10)}px`;
-                        compass.style.top = `${parseInt(compass.style.top) - (compassRadius - 10)}px`;
-                        updateCompassHandlePosition();
-                        arcs.push({ x: parseInt(compass.style.left) + compassRadius, y: parseInt(compass.style.top) + compassRadius, radius: compassRadius });
-                        redrawCanvas();
-                        constructionStep = Math.min(constructionStep + 1, guides[currentLesson].length - 1);
-                        updateGuide();
-                    }
-                }
             });
 
             canvas.addEventListener('mousemove', function (e) {
                 const mousePos = getMousePos(canvas, e);
+                const snappedPos = snapToPoint(mousePos.x, mousePos.y);
+
                 if (currentTool === 'pointer' && draggedElement) {
                     if (draggedElement.type === 'line') {
                         const line = lines[draggedElement.index];
@@ -1574,17 +1462,24 @@
                         line.y2 += dy;
                         redrawCanvas();
                     } else if (draggedElement.type === 'point') {
-                        points[draggedElement.index].x = mousePos.x;
-                        points[draggedElement.index].y = mousePos.y;
+                        points[draggedElement.index].x = snappedPos.x;
+                        points[draggedElement.index].y = snappedPos.y;
                         redrawCanvas();
                     }
                     return;
                 }
+
                 if (currentTool === 'line' && isDrawing) {
-                    currentLine.x2 = mousePos.x;
-                    currentLine.y2 = mousePos.y;
+                    currentLine.x2 = snappedPos.x;
+                    currentLine.y2 = snappedPos.y;
                     redrawCanvas();
                 }
+
+                if (currentTool === 'freehand' && isDrawing) {
+                    currentFreehandPath.points.push({ x: mousePos.x, y: mousePos.y });
+                    redrawCanvas();
+                }
+
                 if (currentTool === 'protractor' && protractorVisible && draggedElement) {
                     if (draggedElement.type === 'protractor-move') {
                         const dx = e.clientX - draggedElement.startX;
@@ -1608,6 +1503,7 @@
                         updateProtractorHandlePosition();
                     }
                 }
+
                 if (currentTool === 'ruler' && rulerVisible && draggedElement) {
                     if (draggedElement.type === 'ruler-move') {
                         const dx = e.clientX - draggedElement.startX;
@@ -1631,28 +1527,36 @@
                         updateRulerHandlePosition();
                     }
                 }
-                if (currentTool === 'compass' && compassVisible && draggedElement && draggedElement.type === 'compass-move') {
-                    const dx = e.clientX - draggedElement.startX;
-                    const dy = e.clientY - draggedElement.startY;
-                    compass.style.left = `${draggedElement.initialLeft + dx}px`;
-                    compass.style.top = `${draggedElement.initialTop + dy}px`;
-                    updateCompassHandlePosition();
-                }
             });
 
             canvas.addEventListener('mouseup', function (e) {
                 const mousePos = getMousePos(canvas, e);
+                const snappedPos = snapToPoint(mousePos.x, mousePos.y);
+
                 if (currentTool === 'pointer' && draggedElement) {
                     draggedElement = null;
                     return;
                 }
+
                 if (currentTool === 'line' && isDrawing) {
                     isDrawing = false;
+                    currentLine.x2 = snappedPos.x;
+                    currentLine.y2 = snappedPos.y;
                     lines.push(currentLine);
+                    actionHistory.push({ type: 'line' });
                     currentLine = null;
                     redrawCanvas();
                 }
-                if ((currentTool === 'protractor' || currentTool === 'ruler' || currentTool === 'compass') && draggedElement) {
+
+                if (currentTool === 'freehand' && isDrawing) {
+                    isDrawing = false;
+                    freehandPaths.push(currentFreehandPath);
+                    actionHistory.push({ type: 'freehand' });
+                    currentFreehandPath = null;
+                    redrawCanvas();
+                }
+
+                if ((currentTool === 'protractor' || currentTool === 'ruler') && draggedElement) {
                     draggedElement = null;
                     isRotating = false;
                 }
@@ -1662,25 +1566,27 @@
                 if (e.key === 'Escape') {
                     if (protractorVisible) toggleProtractor();
                     if (rulerVisible) toggleRuler();
-                    if (compassVisible) toggleCompass();
+                } else if (e.ctrlKey && e.key === 'z') {
+                    undoAction();
                 }
             });
 
-            // Initialize
+            // Initialize with pointer tool active
             setTool('pointer');
-            updateGuide();
 
-            // Animation observer
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in');
-                    }
-                });
-            });
-            document.querySelectorAll('.procedure-section, .activity-section').forEach(section => {
-                observer.observe(section);
-            });
+            // Adjust canvas size for mobile
+            function resizeCanvas() {
+                if (window.innerWidth < 768) {
+                    canvas.width = window.innerWidth - 40;
+                    canvas.height = Math.min(400, window.innerHeight - 200);
+                } else {
+                    canvas.width = 800;
+                    canvas.height = 500;
+                }
+                redrawCanvas();
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
         });
     </script>
 </body>
