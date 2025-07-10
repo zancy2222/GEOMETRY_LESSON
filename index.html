@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Geomaster: An Interactive Website for Geometric Constructions</title>
     <style>
         * {
@@ -16,12 +16,13 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
         }
 
         h1, h2 {
@@ -29,47 +30,50 @@
         }
 
         .construction-method {
-            margin-bottom: 30px;
-            padding: 15px;
+            margin-bottom: 20px;
+            padding: 10px;
             background-color: #f9f9f9;
             border-radius: 5px;
             border-left: 4px solid #3498db;
         }
 
         .step {
-            margin-bottom: 15px;
-            padding: 10px;
+            margin-bottom: 10px;
+            padding: 8px;
             background-color: #ecf0f1;
             border-radius: 3px;
         }
 
         .canvas-container {
-            margin: 20px 0;
+            margin: 15px 0;
             text-align: center;
             position: relative;
             border: 2px solid #3498db;
             border-radius: 10px;
             background: #fff;
-            padding: 10px;
+            padding: 8px;
         }
 
         canvas {
             border: 1px solid #ccc;
             background-color: white;
-            margin: 10px 0;
+            width: 100%;
+            max-width: 800px;
+            height: auto;
             cursor: crosshair;
+            touch-action: none;
         }
 
         .tools {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 12px 20px;
             background-color: #3498db;
             color: white;
             border: none;
@@ -78,6 +82,8 @@
             font-size: 1em;
             position: relative;
             transition: all 0.3s ease;
+            min-width: 80px;
+            touch-action: manipulation;
         }
 
         button:hover {
@@ -112,15 +118,17 @@
         .instructions {
             font-style: italic;
             color: #7f8c8d;
-            margin-top: 10px;
+            margin-top: 8px;
             text-align: center;
+            font-size: 0.9em;
         }
 
         .protractor {
             position: absolute;
-            width: 200px;
-            height: 200px;
+            width: 150px;
+            height: 150px;
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100 20 A80 80 0 0 1 180 100 L100 100 Z" fill="%23f1c40f" fill-opacity="0.3" stroke="%23f39c12" stroke-width="1"/><circle cx="100" cy="100" r="2" fill="%23e74c3c"/><text x="100" y="30" font-size="10" text-anchor="middle">0°</text><text x="180" y="110" font-size="10" text-anchor="middle">90°</text><text x="100" y="190" font-size="10" text-anchor="middle">180°</text><text x="20" y="110" font-size="10" text-anchor="middle">-90°</text><text x="140" y="40" font-size="8" text-anchor="middle">30°</text><text x="160" y="60" font-size="8" text-anchor="middle">45°</text><text x="170" y="85" font-size="8" text-anchor="middle">60°</text><text x="60" y="40" font-size="8" text-anchor="middle">-30°</text><text x="40" y="60" font-size="8" text-anchor="middle">-45°</text><text x="30" y="85" font-size="8" text-anchor="middle">-60°</text></svg>');
+            background-size: contain;
             pointer-events: none;
             display: none;
             z-index: 10;
@@ -130,9 +138,10 @@
 
         .ruler {
             position: absolute;
-            width: 200px;
-            height: 30px;
+            width: 150px;
+            height: 25px;
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="30"><rect width="200" height="30" fill="%23f9f9f9" stroke="%23333" stroke-width="1"/><line x1="0" y1="15" x2="200" y2="15" stroke="%23333" stroke-width="1"/><text x="10" y="10" font-size="8">0</text><text x="190" y="10" font-size="8">20</text><text x="100" y="10" font-size="8">10</text><line x1="20" y1="10" x2="20" y2="20" stroke="%23333" stroke-width="1"/><line x1="40" y1="10" x2="40" y2="20" stroke="%23333" stroke-width="1"/><line x1="60" y1="10" x2="60" y2="20" stroke="%23333" stroke-width="1"/><line x1="80" y1="10" x2="80" y2="20" stroke="%23333" stroke-width="1"/><line x1="120" y1="10" x2="120" y2="20" stroke="%23333" stroke-width="1"/><line x1="140" y1="10" x2="140" y2="20" stroke="%23333" stroke-width="1"/><line x1="160" y1="10" x2="160" y2="20" stroke="%23333" stroke-width="1"/><line x1="180" y1="10" x2="180" y2="20" stroke="%23333" stroke-width="1"/><line x1="5" y1="5" x2="5" y2="25" stroke="%23333" stroke-width="1"/><line x1="195" y1="5" x2="195" y2="25" stroke="%23333" stroke-width="1"/><line x1="50" y1="5" x2="50" y2="25" stroke="%23333" stroke-width="1"/><line x1="150" y1="5" x2="150" y2="25" stroke="%23333" stroke-width="1"/></svg>');
+            background-size: contain;
             pointer-events: none;
             display: none;
             z-index: 10;
@@ -142,8 +151,8 @@
 
         .center-handle {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             background-color: #e74c3c;
             border-radius: 50%;
             z-index: 20;
@@ -153,31 +162,31 @@
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .header h1 {
             color: white;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
             color: rgba(255, 255, 255, 0.9);
-            font-size: 1.2em;
+            font-size: 1em;
         }
 
         .lesson-selector {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 40px;
+            gap: 10px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
@@ -185,18 +194,19 @@
             background: linear-gradient(45deg, #4CAF50, #45a049);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
+            padding: 12px 20px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: bold;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            min-width: 120px;
         }
 
         .lesson-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .lesson-btn.active {
@@ -205,10 +215,10 @@
 
         .content-area {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-bottom: 30px;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
 
         .lesson-content {
@@ -221,23 +231,23 @@
 
         .lesson-title {
             color: #4CAF50;
-            font-size: 2em;
-            margin-bottom: 20px;
+            font-size: 1.6em;
+            margin-bottom: 15px;
             text-align: center;
         }
 
         .procedure-section {
             background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border-left: 5px solid #4CAF50;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4CAF50;
         }
 
         .procedure-section h3 {
             color: #333;
-            margin-bottom: 15px;
-            font-size: 1.4em;
+            margin-bottom: 10px;
+            font-size: 1.2em;
         }
 
         .steps {
@@ -247,10 +257,11 @@
 
         .steps li {
             counter-increment: step-counter;
-            margin-bottom: 15px;
-            padding-left: 40px;
+            margin-bottom: 10px;
+            padding-left: 35px;
             position: relative;
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 0.95em;
         }
 
         .steps li::before {
@@ -260,34 +271,34 @@
             top: 0;
             background: #4CAF50;
             color: white;
-            width: 25px;
-            height: 25px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
 
         .quiz-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 30px;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
             color: white;
         }
 
         .quiz-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .quiz-controls {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
@@ -295,12 +306,13 @@
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 12px 24px;
-            border-radius: 25px;
+            padding: 10px 20px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 0.95em;
             transition: all 0.3s ease;
             backdrop-filter: blur(5px);
+            min-width: 100px;
         }
 
         .quiz-btn:hover {
@@ -311,41 +323,42 @@
         .question-card {
             background: white;
             color: #333;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         }
 
         .question-number {
             background: #4CAF50;
             color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
+            padding: 5px 12px;
+            border-radius: 15px;
             font-weight: bold;
             display: inline-block;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
         }
 
         .question-text {
-            font-size: 1.2em;
-            margin-bottom: 20px;
+            font-size: 1.1em;
+            margin-bottom: 15px;
             font-weight: 500;
         }
 
         .options {
             display: grid;
-            gap: 10px;
+            gap: 8px;
         }
 
         .option {
             background: #f8f9fa;
             border: 2px solid #e9ecef;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 1em;
+            font-size: 0.95em;
         }
 
         .option:hover {
@@ -373,17 +386,17 @@
 
         .quiz-footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .next-btn {
             background: #4CAF50;
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
+            padding: 12px 25px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: bold;
             transition: all 0.3s ease;
         }
@@ -400,66 +413,166 @@
 
         .score-display {
             background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
             text-align: center;
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
         }
 
         .activity-section {
             background: #fff3cd;
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 30px;
-            border-left: 5px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #ffc107;
         }
 
         .activity-title {
             color: #856404;
-            font-size: 1.4em;
-            margin-bottom: 15px;
+            font-size: 1.2em;
+            margin-bottom: 10px;
         }
 
         .final-score {
             background: linear-gradient(45deg, #4CAF50, #45a049);
             color: white;
-            padding: 30px;
-            border-radius: 20px;
+            padding: 20px;
+            border-radius: 15px;
             text-align: center;
-            font-size: 1.5em;
+            font-size: 1.3em;
             margin-top: 20px;
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 8px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .header p {
+                font-size: 0.9em;
+            }
+
             .lesson-selector {
                 flex-direction: column;
                 align-items: center;
+                gap: 8px;
             }
 
             .lesson-btn {
                 width: 100%;
-                max-width: 300px;
+                max-width: 250px;
+                padding: 10px 15px;
+                font-size: 0.95em;
             }
 
             .quiz-controls {
                 flex-direction: column;
                 align-items: center;
+                gap: 8px;
             }
 
             .quiz-btn {
                 width: 100%;
-                max-width: 200px;
+                max-width: 180px;
+                padding: 8px 15px;
+                font-size: 0.9em;
             }
 
             .canvas-container {
                 padding: 5px;
             }
 
-            canvas {
-                width: 100%;
-                height: auto;
+            .tools {
+                gap: 6px;
+                justify-content: center;
+            }
+
+            button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+                min-width: 70px;
+            }
+
+            .protractor, .ruler {
+                width: 120px;
+                height: 120px;
+            }
+
+            .ruler {
+                height: 20px;
+            }
+
+            .center-handle {
+                width: 20px;
+                height: 20px;
+            }
+
+            .lesson-title {
+                font-size: 1.4em;
+            }
+
+            .procedure-section {
+                padding: 10px;
+            }
+
+            .steps li {
+                font-size: 0.9em;
+                padding-left: 30px;
+            }
+
+            .steps li::before {
+                width: 20px;
+                height: 20px;
+                font-size: 0.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.3em;
+            }
+
+            .header p {
+                font-size: 0.85em;
+            }
+
+            .lesson-btn {
+                max-width: 200px;
+                font-size: 0.9em;
+            }
+
+            .quiz-btn {
+                max-width: 160px;
+                font-size: 0.85em;
+            }
+
+            .tools {
+                gap: 5px;
+            }
+
+            button {
+                padding: 8px 12px;
+                font-size: 0.85em;
+                min-width: 60px;
+            }
+
+            .instructions {
+                font-size: 0.8em;
+            }
+
+            .protractor, .ruler {
+                width: 100px;
+                height: 100px;
+            }
+
+            .ruler {
+                height: 18px;
             }
         }
 
@@ -498,13 +611,13 @@
         </div>
 
         <div class="canvas-container">
-            <canvas id="construction-canvas" width="800" height="500"></canvas>
+            <canvas id="construction-canvas"></canvas>
             <div class="protractor" id="protractor"></div>
             <div class="ruler" id="ruler"></div>
             <div class="center-handle" id="protractor-handle"></div>
             <div class="center-handle" id="ruler-handle"></div>
         </div>
-        <div class="instructions">Use the tools to construct geometric shapes. Press ESC to hide protractor/ruler.</div>
+        <div class="instructions">Use the tools to construct geometric shapes. Press ESC or tap to hide protractor/ruler.</div>
 
         <div class="lesson-selector">
             <button class="lesson-btn active" onclick="showLesson(1)">📐 Perpendicular Bisector</button>
@@ -513,7 +626,6 @@
         </div>
 
         <div class="content-area">
-            <!-- Lesson 1: Perpendicular Bisector -->
             <div id="lesson1" class="lesson-content active">
                 <h2 class="lesson-title">Perpendicular Bisector</h2>
                 <div class="procedure-section">
@@ -540,7 +652,6 @@
                 </div>
             </div>
 
-            <!-- Lesson 2: Triangle Construction -->
             <div id="lesson2" class="lesson-content">
                 <h2 class="lesson-title">Triangle Construction (SSS, SAS, ASA)</h2>
                 <div class="procedure-section">
@@ -582,7 +693,6 @@
                 </div>
             </div>
 
-            <!-- Lesson 3: Triangle from Side Lengths -->
             <div id="lesson3" class="lesson-content">
                 <h2 class="lesson-title">Constructing a Triangle Given Its Side Lengths</h2>
                 <div class="procedure-section">
@@ -635,7 +745,6 @@
     </div>
 
     <script>
-        // Question data
         const questions = {
             1: [
                 {
@@ -945,14 +1054,12 @@
             ]
         };
 
-        // Quiz variables
         let currentQuiz = [];
         let currentQuestionIndex = 0;
         let score = 0;
         let selectedAnswer = null;
         let quizActive = false;
 
-        // Show lesson function
         function showLesson(lessonNum) {
             document.querySelectorAll('.lesson-content').forEach(lesson => {
                 lesson.classList.remove('active');
@@ -967,7 +1074,6 @@
             quizActive = false;
         }
 
-        // Shuffle array function
         function shuffleArray(array) {
             const shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -977,7 +1083,6 @@
             return shuffled;
         }
 
-        // Start quiz function
         function startQuiz(lessonNum) {
             currentQuiz = shuffleArray(questions[lessonNum]);
             currentQuestionIndex = 0;
@@ -989,7 +1094,6 @@
             showQuestion();
         }
 
-        // Start mixed quiz function
         function startMixedQuiz() {
             const allQuestions = [...questions[1], ...questions[2], ...questions[3]];
             currentQuiz = shuffleArray(allQuestions).slice(0, 20);
@@ -1002,7 +1106,6 @@
             showQuestion();
         }
 
-        // Show question function
         function showQuestion() {
             if (currentQuestionIndex >= currentQuiz.length) {
                 showFinalScore();
@@ -1029,7 +1132,6 @@
             selectedAnswer = null;
         }
 
-        // Select answer function
         function selectAnswer(answerIndex) {
             if (selectedAnswer !== null) return;
             selectedAnswer = answerIndex;
@@ -1054,13 +1156,11 @@
             }, 2000);
         }
 
-        // Next question function
         function nextQuestion() {
             currentQuestionIndex++;
             showQuestion();
         }
 
-        // Show final score function
         function showFinalScore() {
             document.getElementById('quiz-container').style.display = 'none';
             const percentage = Math.round((score / currentQuiz.length) * 100);
@@ -1087,7 +1187,7 @@
                     <h2>${emoji} Quiz Complete!</h2>
                     <p>Your Score: ${score}/${currentQuiz.length} (${percentage}%)</p>
                     <p>${message}</p>
-                    <button class="quiz-btn" onclick="location.reload()" style="margin-top: 20px;">
+                    <button class="quiz-btn" onclick="location.reload()" style="margin-top: 15px;">
                         🔄 Try Again
                     </button>
                 </div>
@@ -1096,8 +1196,7 @@
             quizActive = false;
         }
 
-        // Initialize the page
-        document.addEventListener(' anna', function () {
+        document.addEventListener('DOMContentLoaded', function () {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -1135,7 +1234,6 @@
             let isRotating = false;
             let actionHistory = [];
 
-            // Tool buttons
             document.getElementById('pointer-btn').addEventListener('click', () => setTool('pointer'));
             document.getElementById('line-btn').addEventListener('click', () => setTool('line'));
             document.getElementById('point-btn').addEventListener('click', () => setTool('point'));
@@ -1165,8 +1263,8 @@
                     setTool('protractor');
                     if (!protractor.style.left) {
                         const rect = canvas.getBoundingClientRect();
-                        protractor.style.left = `${rect.width / 2 - 100}px`;
-                        protractor.style.top = `${rect.height / 2 - 100}px`;
+                        protractor.style.left = `${rect.width / 2 - (window.innerWidth < 768 ? 60 : 75)}px`;
+                        protractor.style.top = `${rect.height / 2 - (window.innerWidth < 768 ? 60 : 75)}px`;
                     }
                     updateProtractorHandlePosition();
                     protractorHandle.style.display = 'block';
@@ -1183,8 +1281,8 @@
                     setTool('ruler');
                     if (!ruler.style.left) {
                         const rect = canvas.getBoundingClientRect();
-                        ruler.style.left = `${rect.width / 2 - 100}px`;
-                        ruler.style.top = `${rect.height / 2 - 15}px`;
+                        ruler.style.left = `${rect.width / 2 - (window.innerWidth < 768 ? 60 : 75)}px`;
+                        ruler.style.top = `${rect.height / 2 - (window.innerWidth < 768 ? 10 : 12.5)}px`;
                     }
                     updateRulerHandlePosition();
                     rulerHandle.style.display = 'block';
@@ -1196,15 +1294,15 @@
             function updateProtractorHandlePosition() {
                 const protractorRect = protractor.getBoundingClientRect();
                 const canvasRect = canvas.getBoundingClientRect();
-                protractorHandle.style.left = `${protractorRect.left + protractorRect.width / 2 - canvasRect.left - 6}px`;
-                protractorHandle.style.top = `${protractorRect.top + protractorRect.height / 2 - canvasRect.top - 6}px`;
+                protractorHandle.style.left = `${protractorRect.left + protractorRect.width / 2 - canvasRect.left - 8}px`;
+                protractorHandle.style.top = `${protractorRect.top + protractorRect.height / 2 - canvasRect.top - 8}px`;
             }
 
             function updateRulerHandlePosition() {
                 const rulerRect = ruler.getBoundingClientRect();
                 const canvasRect = canvas.getBoundingClientRect();
-                rulerHandle.style.left = `${rulerRect.left + rulerRect.width / 2 - canvasRect.left - 6}px`;
-                rulerHandle.style.top = `${rulerRect.top + rulerRect.height / 2 - canvasRect.top - 6}px`;
+                rulerHandle.style.left = `${rulerRect.left + rulerRect.width / 2 - canvasRect.left - 8}px`;
+                rulerHandle.style.top = `${rulerRect.top + rulerRect.height / 2 - canvasRect.top - 8}px`;
             }
 
             function clearCanvas() {
@@ -1234,14 +1332,14 @@
 
             function drawPoint(x, y, label = '') {
                 ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.arc(x, y, window.innerWidth < 768 ? 3 : 4, 0, Math.PI * 2);
                 ctx.fillStyle = '#e74c3c';
                 ctx.fill();
                 ctx.strokeStyle = '#2c3e50';
                 ctx.lineWidth = 1;
                 ctx.stroke();
                 if (label) {
-                    ctx.font = '14px Arial';
+                    ctx.font = window.innerWidth < 768 ? '12px Arial' : '14px Arial';
                     ctx.fillStyle = '#2c3e50';
                     ctx.fillText(label, x + 10, y + 5);
                 }
@@ -1252,7 +1350,7 @@
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
                 ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 2;
+                ctx.lineWidth = window.innerWidth < 768 ? 1.5 : 2;
                 ctx.stroke();
             }
 
@@ -1264,7 +1362,7 @@
                     ctx.lineTo(path.points[i].x, path.points[i].y);
                 }
                 ctx.strokeStyle = '#2c3e50';
-                ctx.lineWidth = 1.5;
+                ctx.lineWidth = window.innerWidth < 768 ? 1 : 1.5;
                 ctx.stroke();
             }
 
@@ -1281,11 +1379,13 @@
                 }
             }
 
-            function getMousePos(canvas, evt) {
+            function getEventPos(canvas, evt) {
                 const rect = canvas.getBoundingClientRect();
+                const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
+                const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
                 return {
-                    x: evt.clientX - rect.left,
-                    y: evt.clientY - rect.top
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
                 };
             }
 
@@ -1293,7 +1393,7 @@
                 for (let point of points) {
                     const dx = x - point.x;
                     const dy = y - point.y;
-                    if (Math.sqrt(dx * dx + dy * dy) < 10) {
+                    if (Math.sqrt(dx * dx + dy * dy) < (window.innerWidth < 768 ? 12 : 10)) {
                         return { x: point.x, y: point.y };
                     }
                 }
@@ -1324,17 +1424,19 @@
                 }
                 const dx = x - xx;
                 const dy = y - yy;
-                return Math.sqrt(dx * dx + dy * dy) < 10;
+                return Math.sqrt(dx * dx + dy * dy) < (window.innerWidth < 768 ? 12 : 10);
             }
 
             function isPointNearPoint(x, y, point) {
                 const dx = x - point.x;
                 const dy = y - point.y;
-                return Math.sqrt(dx * dx + dy * dy) < 10;
+                return Math.sqrt(dx * dx + dy * dy) < (window.innerWidth < 768 ? 12 : 10);
             }
 
-            canvas.addEventListener('mousedown', function (e) {
-                const mousePos = getMousePos(canvas, e);
+            function handleStart(e) {
+                e.preventDefault();
+                const evt = e.type === 'touchstart' ? e.touches[0] : e;
+                const mousePos = getEventPos(canvas, evt);
                 const snappedPos = snapToPoint(mousePos.x, mousePos.y);
 
                 if (currentTool === 'pointer') {
@@ -1376,15 +1478,17 @@
                         x: handleRect.left + handleRect.width / 2,
                         y: handleRect.top + handleRect.height / 2
                     };
+                    const clientX = evt.clientX || evt.touches[0].clientX;
+                    const clientY = evt.clientY || evt.touches[0].clientY;
                     const distance = Math.sqrt(
-                        Math.pow(e.clientX - handleCenter.x, 2) +
-                        Math.pow(e.clientY - handleCenter.y, 2)
+                        Math.pow(clientX - handleCenter.x, 2) +
+                        Math.pow(clientY - handleCenter.y, 2)
                     );
-                    if (distance < 15) {
+                    if (distance < 20) {
                         draggedElement = {
                             type: 'protractor-move',
-                            startX: e.clientX,
-                            startY: e.clientY,
+                            startX: clientX,
+                            startY: clientY,
                             initialLeft: parseFloat(protractor.style.left),
                             initialTop: parseFloat(protractor.style.top)
                         };
@@ -1396,8 +1500,8 @@
                             y: protractorRect.top + protractorRect.height / 2
                         };
                         const angle = Math.atan2(
-                            e.clientY - protractorCenter.y,
-                            e.clientX - protractorCenter.x
+                            clientY - protractorCenter.y,
+                            clientX - protractorCenter.x
                         );
                         draggedElement = {
                             type: 'protractor-rotate',
@@ -1414,15 +1518,17 @@
                         x: handleRect.left + handleRect.width / 2,
                         y: handleRect.top + handleRect.height / 2
                     };
+                    const clientX = evt.clientX || evt.touches[0].clientX;
+                    const clientY = evt.clientY || evt.touches[0].clientY;
                     const distance = Math.sqrt(
-                        Math.pow(e.clientX - handleCenter.x, 2) +
-                        Math.pow(e.clientY - handleCenter.y, 2)
+                        Math.pow(clientX - handleCenter.x, 2) +
+                        Math.pow(clientY - handleCenter.y, 2)
                     );
-                    if (distance < 15) {
+                    if (distance < 20) {
                         draggedElement = {
                             type: 'ruler-move',
-                            startX: e.clientX,
-                            startY: e.clientY,
+                            startX: clientX,
+                            startY: clientY,
                             initialLeft: parseFloat(ruler.style.left),
                             initialTop: parseFloat(ruler.style.top)
                         };
@@ -1434,8 +1540,8 @@
                             y: rulerRect.top + rulerRect.height / 2
                         };
                         const angle = Math.atan2(
-                            e.clientY - rulerCenter.y,
-                            e.clientX - rulerCenter.x
+                            clientY - rulerCenter.y,
+                            clientX - rulerCenter.x
                         );
                         draggedElement = {
                             type: 'ruler-rotate',
@@ -1445,10 +1551,12 @@
                         isRotating = true;
                     }
                 }
-            });
+            }
 
-            canvas.addEventListener('mousemove', function (e) {
-                const mousePos = getMousePos(canvas, e);
+            function handleMove(e) {
+                e.preventDefault();
+                const evt = e.type === 'touchmove' ? e.touches[0] : e;
+                const mousePos = getEventPos(canvas, evt);
                 const snappedPos = snapToPoint(mousePos.x, mousePos.y);
 
                 if (currentTool === 'pointer' && draggedElement) {
@@ -1481,9 +1589,11 @@
                 }
 
                 if (currentTool === 'protractor' && protractorVisible && draggedElement) {
+                    const clientX = evt.clientX || evt.touches[0].clientX;
+                    const clientY = evt.clientY || evt.touches[0].clientY;
                     if (draggedElement.type === 'protractor-move') {
-                        const dx = e.clientX - draggedElement.startX;
-                        const dy = e.clientY - draggedElement.startY;
+                        const dx = clientX - draggedElement.startX;
+                        const dy = clientY - draggedElement.startY;
                         protractor.style.left = `${draggedElement.initialLeft + dx}px`;
                         protractor.style.top = `${draggedElement.initialTop + dy}px`;
                         updateProtractorHandlePosition();
@@ -1494,8 +1604,8 @@
                             y: protractorRect.top + protractorRect.height / 2
                         };
                         const currentAngle = Math.atan2(
-                            e.clientY - protractorCenter.y,
-                            e.clientX - protractorCenter.x
+                            clientY - protractorCenter.y,
+                            clientX - protractorCenter.x
                         );
                         const angleDiff = currentAngle - draggedElement.startAngle;
                         protractorAngle = draggedElement.initialRotation + angleDiff * (180 / Math.PI);
@@ -1505,9 +1615,11 @@
                 }
 
                 if (currentTool === 'ruler' && rulerVisible && draggedElement) {
+                    const clientX = evt.clientX || evt.touches[0].clientX;
+                    const clientY = evt.clientY || evt.touches[0].clientY;
                     if (draggedElement.type === 'ruler-move') {
-                        const dx = e.clientX - draggedElement.startX;
-                        const dy = e.clientY - draggedElement.startY;
+                        const dx = clientX - draggedElement.startX;
+                        const dy = clientY - draggedElement.startY;
                         ruler.style.left = `${draggedElement.initialLeft + dx}px`;
                         ruler.style.top = `${draggedElement.initialTop + dy}px`;
                         updateRulerHandlePosition();
@@ -1518,8 +1630,8 @@
                             y: rulerRect.top + rulerRect.height / 2
                         };
                         const currentAngle = Math.atan2(
-                            e.clientY - rulerCenter.y,
-                            e.clientX - rulerCenter.x
+                            clientY - rulerCenter.y,
+                            clientX - rulerCenter.x
                         );
                         const angleDiff = currentAngle - draggedElement.startAngle;
                         rulerAngle = draggedElement.initialRotation + angleDiff * (180 / Math.PI);
@@ -1527,10 +1639,12 @@
                         updateRulerHandlePosition();
                     }
                 }
-            });
+            }
 
-            canvas.addEventListener('mouseup', function (e) {
-                const mousePos = getMousePos(canvas, e);
+            function handleEnd(e) {
+                e.preventDefault();
+                const evt = e.type === 'touchend' ? e.changedTouches[0] : e;
+                const mousePos = getEventPos(canvas, evt);
                 const snappedPos = snapToPoint(mousePos.x, mousePos.y);
 
                 if (currentTool === 'pointer' && draggedElement) {
@@ -1560,7 +1674,14 @@
                     draggedElement = null;
                     isRotating = false;
                 }
-            });
+            }
+
+            canvas.addEventListener('mousedown', handleStart);
+            canvas.addEventListener('mousemove', handleMove);
+            canvas.addEventListener('mouseup', handleEnd);
+            canvas.addEventListener('touchstart', handleStart, { passive: false });
+            canvas.addEventListener('touchmove', handleMove, { passive: false });
+            canvas.addEventListener('touchend', handleEnd, { passive: false });
 
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
@@ -1571,22 +1692,26 @@
                 }
             });
 
-            // Initialize with pointer tool active
-            setTool('pointer');
-
-            // Adjust canvas size for mobile
-            function resizeCanvas() {
-                if (window.innerWidth < 768) {
-                    canvas.width = window.innerWidth - 40;
-                    canvas.height = Math.min(400, window.innerHeight - 200);
-                } else {
-                    canvas.width = 800;
-                    canvas.height = 500;
+            // Tap to hide protractor/ruler on mobile
+            canvas.addEventListener('touchstart', function (e) {
+                if (e.touches.length === 2) {
+                    if (protractorVisible) toggleProtractor();
+                    if (rulerVisible) toggleRuler();
                 }
+            });
+
+            function resizeCanvas() {
+                const container = canvas.parentElement;
+                const maxWidth = Math.min(window.innerWidth - 20, 800);
+                const aspectRatio = 500 / 800;
+                canvas.width = maxWidth;
+                canvas.height = maxWidth * aspectRatio;
                 redrawCanvas();
             }
             window.addEventListener('resize', resizeCanvas);
             resizeCanvas();
+
+            setTool('pointer');
         });
     </script>
 </body>
