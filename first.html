@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Construction Tutorial</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .construction-method {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .step {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 3px;
+        }
+        .canvas-container {
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            background-color: white;
+            margin: 10px 0;
+        }
+        .tools {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .active-tool {
+            background-color: #2c3e50;
+        }
+        .tool-active {
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        .instructions {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .protractor {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100 20 A80 80 0 0 1 180 100 L100 100 Z" fill="%23f1c40f" fill-opacity="0.3" stroke="%23f39c12" stroke-width="1"/><circle cx="100" cy="100" r="2" fill="%23e74c3c"/><text x="100" y="30" font-size="10" text-anchor="middle">0°</text><text x="180" y="110" font-size="10" text-anchor="middle">90°</text><text x="100" y="190" font-size="10" text-anchor="middle">180°</text><text x="20" y="110" font-size="10" text-anchor="middle">-90°</text><text x="140" y="40" font-size="8" text-anchor="middle">30°</text><text x="160" y="60" font-size="8" text-anchor="middle">45°</text><text x="170" y="85" font-size="8" text-anchor="middle">60°</text><text x="60" y="40" font-size="8" text-anchor="middle">-30°</text><text x="40" y="60" font-size="8" text-anchor="middle">-45°</text><text x="30" y="85" font-size="8" text-anchor="middle">-60°</text></svg>');
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+            transform-origin: center;
+            transition: transform 0.1s;
+        }
+        .ruler {
+            position: absolute;
+            width: 200px;
+            height: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="30"><rect width="200" height="30" fill="%23f9f9f9" stroke="%23333" stroke-width="1"/><line x1="0" y1="15" x2="200" y2="15" stroke="%23333" stroke-width="1"/><text x="10" y="10" font-size="8">0</text><text x="190" y="10" font-size="8">20</text><text x="100" y="10" font-size="8">10</text><line x1="20" y1="10" x2="20" y2="20" stroke="%23333" stroke-width="1"/><line x1="40" y1="10" x2="40" y2="20" stroke="%23333" stroke-width="1"/><line x1="60" y1="10" x2="60" y2="20" stroke="%23333" stroke-width="1"/><line x1="80" y1="10" x2="80" y2="20" stroke="%23333" stroke-width="1"/><line x1="120" y1="10" x2="120" y2="20" stroke="%23333" stroke-width="1"/><line x1="140" y1="10" x2="140" y2="20" stroke="%23333" stroke-width="1"/><line x1="160" y1="10" x2="160" y2="20" stroke="%23333" stroke-width="1"/><line x1="180" y1="10" x2="180" y2="20" stroke="%23333" stroke-width="1"/><line x1="5" y1="5" x2="5" y2="25" stroke="%23333" stroke-width="1"/><line x1="195" y1="5" x2="195" y2="25" stroke="%23333" stroke-width="1"/><line x1="50" y1="5" x2="50" y2="25" stroke="%23333" stroke-width="1"/><line x1="150" y1="5" x2="150" y2="25" stroke="%23333" stroke-width="1"/></svg>');
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+            transform-origin: center;
+            transition: transform 0.1s;
+        }
+        .center-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            z-index: 20;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Constructing Triangles Using SSS, SAS, or ASA</h1>
+
+        <div class="tools">
+            <button id="pointer-btn">Pointer</button>
+            <button id="line-btn">Line</button>
+            <button id="point-btn">Point</button>
+            <button id="protractor-btn">Protractor</button>
+            <button id="ruler-btn">Ruler</button>
+            <button id="clear-btn">Clear</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="construction-canvas" width="800" height="500"></canvas>
+            <div class="protractor" id="protractor"></div>
+            <div class="ruler" id="ruler"></div>
+            <div class="center-handle" id="protractor-handle"></div>
+            <div class="center-handle" id="ruler-handle"></div>
+        </div>
+
+  
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('construction-canvas');
+            const ctx = canvas.getContext('2d');
+            const protractor = document.getElementById('protractor');
+            const ruler = document.getElementById('ruler');
+            const protractorHandle = document.getElementById('protractor-handle');
+            const rulerHandle = document.getElementById('ruler-handle');
+
+            let currentTool = 'pointer';
+            let isDrawing = false;
+            let startX, startY;
+            let points = [];
+            let lines = [];
+            let currentLine = null;
+            let draggedElement = null;
+            let protractorVisible = false;
+            let rulerVisible = false;
+            let protractorAngle = 0;
+            let rulerAngle = 0;
+            let isRotating = false;
+
+            // Tool buttons
+            document.getElementById('pointer-btn').addEventListener('click', () => setTool('pointer'));
+            document.getElementById('line-btn').addEventListener('click', () => setTool('line'));
+            document.getElementById('point-btn').addEventListener('click', () => setTool('point'));
+            document.getElementById('protractor-btn').addEventListener('click', toggleProtractor);
+            document.getElementById('ruler-btn').addEventListener('click', toggleRuler);
+            document.getElementById('clear-btn').addEventListener('click', clearCanvas);
+
+            function setTool(tool) {
+                currentTool = tool;
+                document.querySelectorAll('.tools button').forEach(btn => {
+                    btn.classList.remove('active-tool');
+                    btn.classList.remove('tool-active');
+                });
+                document.getElementById(`${tool}-btn`).classList.add('active-tool');
+                
+                // Hide handles when switching tools
+                protractorHandle.style.display = 'none';
+                rulerHandle.style.display = 'none';
+            }
+
+            function toggleProtractor() {
+                protractorVisible = !protractorVisible;
+                protractor.style.display = protractorVisible ? 'block' : 'none';
+                document.getElementById('protractor-btn').classList.toggle('tool-active', protractorVisible);
+                
+                if (protractorVisible) {
+                    setTool('protractor');
+                    // Position protractor in center if not already positioned
+                    if (!protractor.style.left) {
+                        const rect = canvas.getBoundingClientRect();
+                        protractor.style.left = `${rect.width/2 - 100}px`;
+                        protractor.style.top = `${rect.height/2 - 100}px`;
+                    }
+                    // Show handle
+                    updateProtractorHandlePosition();
+                    protractorHandle.style.display = 'block';
+                } else {
+                    setTool('pointer');
+                }
+            }
+
+            function toggleRuler() {
+                rulerVisible = !rulerVisible;
+                ruler.style.display = rulerVisible ? 'block' : 'none';
+                document.getElementById('ruler-btn').classList.toggle('tool-active', rulerVisible);
+                
+                if (rulerVisible) {
+                    setTool('ruler');
+                    // Position ruler in center if not already positioned
+                    if (!ruler.style.left) {
+                        const rect = canvas.getBoundingClientRect();
+                        ruler.style.left = `${rect.width/2 - 100}px`;
+                        ruler.style.top = `${rect.height/2 - 15}px`;
+                    }
+                    // Show handle
+                    updateRulerHandlePosition();
+                    rulerHandle.style.display = 'block';
+                } else {
+                    setTool('pointer');
+                }
+            }
+
+            function updateProtractorHandlePosition() {
+                const protractorRect = protractor.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                protractorHandle.style.left = `${protractorRect.left + protractorRect.width/2 - canvasRect.left - 5}px`;
+                protractorHandle.style.top = `${protractorRect.top + protractorRect.height/2 - canvasRect.top - 5}px`;
+            }
+
+            function updateRulerHandlePosition() {
+                const rulerRect = ruler.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                rulerHandle.style.left = `${rulerRect.left + rulerRect.width/2 - canvasRect.left - 5}px`;
+                rulerHandle.style.top = `${rulerRect.top + rulerRect.height/2 - canvasRect.top - 5}px`;
+            }
+
+            function clearCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                points = [];
+                lines = [];
+                currentLine = null;
+            }
+
+            function drawPoint(x, y, label = '') {
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+                ctx.stroke();
+
+                if (label) {
+                    ctx.font = '12px Arial';
+                    ctx.fillStyle = 'black';
+                    ctx.fillText(label, x + 8, y + 3);
+                }
+            }
+
+            function drawLine(x1, y1, x2, y2) {
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = 'blue';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            function redrawCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw all lines
+                lines.forEach(line => {
+                    drawLine(line.x1, line.y1, line.x2, line.y2);
+                });
+
+                // Draw all points
+                points.forEach(point => {
+                    drawPoint(point.x, point.y, point.label);
+                });
+
+                // Draw current line if in progress
+                if (currentLine) {
+                    drawLine(currentLine.x1, currentLine.y1, currentLine.x2, currentLine.y2);
+                }
+            }
+
+            function getMousePos(canvas, evt) {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: evt.clientX - rect.left,
+                    y: evt.clientY - rect.top
+                };
+            }
+
+            function isPointNearLine(x, y, line) {
+                // Simplified distance from point to line segment
+                const A = x - line.x1;
+                const B = y - line.y1;
+                const C = line.x2 - line.x1;
+                const D = line.y2 - line.y1;
+
+                const dot = A * C + B * D;
+                const len_sq = C * C + D * D;
+                let param = -1;
+                if (len_sq !== 0) {
+                    param = dot / len_sq;
+                }
+
+                let xx, yy;
+
+                if (param < 0) {
+                    xx = line.x1;
+                    yy = line.y1;
+                } else if (param > 1) {
+                    xx = line.x2;
+                    yy = line.y2;
+                } else {
+                    xx = line.x1 + param * C;
+                    yy = line.y1 + param * D;
+                }
+
+                const dx = x - xx;
+                const dy = y - yy;
+                return Math.sqrt(dx * dx + dy * dy) < 10;
+            }
+
+            function isPointNearPoint(x, y, point) {
+                const dx = x - point.x;
+                const dy = y - point.y;
+                return Math.sqrt(dx * dx + dy * dy) < 10;
+            }
+
+            canvas.addEventListener('mousedown', function(e) {
+                const mousePos = getMousePos(canvas, e);
+
+                if (currentTool === 'pointer') {
+                    // Check if clicking on a line
+                    for (let i = 0; i < lines.length; i++) {
+                        if (isPointNearLine(mousePos.x, mousePos.y, lines[i])) {
+                            draggedElement = { type: 'line', index: i, offsetX: mousePos.x - lines[i].x1, offsetY: mousePos.y - lines[i].y1 };
+                            return;
+                        }
+                    }
+
+                    // Check if clicking on a point
+                    for (let i = 0; i < points.length; i++) {
+                        if (isPointNearPoint(mousePos.x, mousePos.y, points[i])) {
+                            draggedElement = { type: 'point', index: i };
+                            return;
+                        }
+                    }
+                }
+
+                if (currentTool === 'line') {
+                    isDrawing = true;
+                    startX = mousePos.x;
+                    startY = mousePos.y;
+                    currentLine = { x1: startX, y1: startY, x2: startX, y2: startY };
+                }
+
+                if (currentTool === 'point') {
+                    points.push({ x: mousePos.x, y: mousePos.y, label: String.fromCharCode(65 + points.length) });
+                    redrawCanvas();
+                }
+
+                if (currentTool === 'protractor' && protractorVisible) {
+                    // Check if clicking on the handle
+                    const handleRect = protractorHandle.getBoundingClientRect();
+                    const handleCenter = {
+                        x: handleRect.left + handleRect.width/2,
+                        y: handleRect.top + handleRect.height/2
+                    };
+                    const distance = Math.sqrt(
+                        Math.pow(e.clientX - handleCenter.x, 2) + 
+                        Math.pow(e.clientY - handleCenter.y, 2)
+                    );
+                    
+                    if (distance < 15) {
+                        draggedElement = { 
+                            type: 'protractor-move', 
+                            startX: e.clientX, 
+                            startY: e.clientY,
+                            initialLeft: parseInt(protractor.style.left),
+                            initialTop: parseInt(protractor.style.top)
+                        };
+                        isRotating = false;
+                    } else {
+                        // Check if clicking near the edge for rotation
+                        const protractorRect = protractor.getBoundingClientRect();
+                        const protractorCenter = {
+                            x: protractorRect.left + protractorRect.width/2,
+                            y: protractorRect.top + protractorRect.height/2
+                        };
+                        const angle = Math.atan2(
+                            e.clientY - protractorCenter.y,
+                            e.clientX - protractorCenter.x
+                        );
+                        
+                        draggedElement = { 
+                            type: 'protractor-rotate', 
+                            startAngle: angle,
+                            initialRotation: protractorAngle
+                        };
+                        isRotating = true;
+                    }
+                }
+
+                if (currentTool === 'ruler' && rulerVisible) {
+                    // Check if clicking on the handle
+                    const handleRect = rulerHandle.getBoundingClientRect();
+                    const handleCenter = {
+                        x: handleRect.left + handleRect.width/2,
+                        y: handleRect.top + handleRect.height/2
+                    };
+                    const distance = Math.sqrt(
+                        Math.pow(e.clientX - handleCenter.x, 2) + 
+                        Math.pow(e.clientY - handleCenter.y, 2)
+                    );
+                    
+                    if (distance < 15) {
+                        draggedElement = { 
+                            type: 'ruler-move', 
+                            startX: e.clientX, 
+                            startY: e.clientY,
+                            initialLeft: parseInt(ruler.style.left),
+                            initialTop: parseInt(ruler.style.top)
+                        };
+                        isRotating = false;
+                    } else {
+                        // Check if clicking near the edge for rotation
+                        const rulerRect = ruler.getBoundingClientRect();
+                        const rulerCenter = {
+                            x: rulerRect.left + rulerRect.width/2,
+                            y: rulerRect.top + rulerRect.height/2
+                        };
+                        const angle = Math.atan2(
+                            e.clientY - rulerCenter.y,
+                            e.clientX - rulerCenter.x
+                        );
+                        
+                        draggedElement = { 
+                            type: 'ruler-rotate', 
+                            startAngle: angle,
+                            initialRotation: rulerAngle
+                        };
+                        isRotating = true;
+                    }
+                }
+            });
+
+            canvas.addEventListener('mousemove', function(e) {
+                const mousePos = getMousePos(canvas, e);
+
+                if (currentTool === 'pointer' && draggedElement) {
+                    if (draggedElement.type === 'line') {
+                        const line = lines[draggedElement.index];
+                        const dx = mousePos.x - draggedElement.offsetX - line.x1;
+                        const dy = mousePos.y - draggedElement.offsetY - line.y1;
+
+                        line.x1 += dx;
+                        line.y1 += dy;
+                        line.x2 += dx;
+                        line.y2 += dy;
+
+                        redrawCanvas();
+                    } else if (draggedElement.type === 'point') {
+                        points[draggedElement.index].x = mousePos.x;
+                        points[draggedElement.index].y = mousePos.y;
+                        redrawCanvas();
+                    }
+                    return;
+                }
+
+                if (currentTool === 'line' && isDrawing) {
+                    currentLine.x2 = mousePos.x;
+                    currentLine.y2 = mousePos.y;
+                    redrawCanvas();
+                }
+
+                if (currentTool === 'protractor' && protractorVisible && draggedElement) {
+                    if (draggedElement.type === 'protractor-move') {
+                        const dx = e.clientX - draggedElement.startX;
+                        const dy = e.clientY - draggedElement.startY;
+                        
+                        protractor.style.left = `${draggedElement.initialLeft + dx}px`;
+                        protractor.style.top = `${draggedElement.initialTop + dy}px`;
+                        updateProtractorHandlePosition();
+                    } else if (draggedElement.type === 'protractor-rotate') {
+                        const protractorRect = protractor.getBoundingClientRect();
+                        const protractorCenter = {
+                            x: protractorRect.left + protractorRect.width/2,
+                            y: protractorRect.top + protractorRect.height/2
+                        };
+                        const currentAngle = Math.atan2(
+                            e.clientY - protractorCenter.y,
+                            e.clientX - protractorCenter.x
+                        );
+                        
+                        const angleDiff = currentAngle - draggedElement.startAngle;
+                        protractorAngle = draggedElement.initialRotation + angleDiff * (180/Math.PI);
+                        protractor.style.transform = `rotate(${protractorAngle}deg)`;
+                        updateProtractorHandlePosition();
+                    }
+                }
+
+                if (currentTool === 'ruler' && rulerVisible && draggedElement) {
+                    if (draggedElement.type === 'ruler-move') {
+                        const dx = e.clientX - draggedElement.startX;
+                        const dy = e.clientY - draggedElement.startY;
+                        
+                        ruler.style.left = `${draggedElement.initialLeft + dx}px`;
+                        ruler.style.top = `${draggedElement.initialTop + dy}px`;
+                        updateRulerHandlePosition();
+                    } else if (draggedElement.type === 'ruler-rotate') {
+                        const rulerRect = ruler.getBoundingClientRect();
+                        const rulerCenter = {
+                            x: rulerRect.left + rulerRect.width/2,
+                            y: rulerRect.top + rulerRect.height/2
+                        };
+                        const currentAngle = Math.atan2(
+                            e.clientY - rulerCenter.y,
+                            e.clientX - rulerCenter.x
+                        );
+                        
+                        const angleDiff = currentAngle - draggedElement.startAngle;
+                        rulerAngle = draggedElement.initialRotation + angleDiff * (180/Math.PI);
+                        ruler.style.transform = `rotate(${rulerAngle}deg)`;
+                        updateRulerHandlePosition();
+                    }
+                }
+            });
+
+            canvas.addEventListener('mouseup', function(e) {
+                const mousePos = getMousePos(canvas, e);
+
+                if (currentTool === 'pointer' && draggedElement) {
+                    draggedElement = null;
+                    return;
+                }
+
+                if (currentTool === 'line' && isDrawing) {
+                    isDrawing = false;
+                    lines.push(currentLine);
+                    currentLine = null;
+                    redrawCanvas();
+                }
+
+                if ((currentTool === 'protractor' || currentTool === 'ruler') && draggedElement) {
+                    draggedElement = null;
+                    isRotating = false;
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (protractorVisible) {
+                        toggleProtractor();
+                    }
+                    if (rulerVisible) {
+                        toggleRuler();
+                    }
+                }
+            });
+
+            // Initialize with pointer tool active
+            setTool('pointer');
+        });
+    </script>
+</body>
+</html>

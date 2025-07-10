@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Geometry Learning</title>
+    <title>Geomaster: An Interactive Website for Geometric Constructions</title>
     <style>
         * {
             margin: 0;
@@ -24,6 +24,117 @@
             padding: 20px;
         }
 
+        h1, h2 {
+            color: #2c3e50;
+        }
+
+        .construction-method {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+
+        .step {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 3px;
+        }
+
+        .canvas-container {
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            background-color: white;
+            margin: 10px 0;
+        }
+
+        .tools {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .active-tool {
+            background-color: #2c3e50;
+        }
+
+        .tool-active {
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .instructions {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .protractor {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100 20 A80 80 0 0 1 180 100 L100 100 Z" fill="%23f1c40f" fill-opacity="0.3" stroke="%23f39c12" stroke-width="1"/><circle cx="100" cy="100" r="2" fill="%23e74c3c"/><text x="100" y="30" font-size="10" text-anchor="middle">0°</text><text x="180" y="110" font-size="10" text-anchor="middle">90°</text><text x="100" y="190" font-size="10" text-anchor="middle">180°</text><text x="20" y="110" font-size="10" text-anchor="middle">-90°</text><text x="140" y="40" font-size="8" text-anchor="middle">30°</text><text x="160" y="60" font-size="8" text-anchor="middle">45°</text><text x="170" y="85" font-size="8" text-anchor="middle">60°</text><text x="60" y="40" font-size="8" text-anchor="middle">-30°</text><text x="40" y="60" font-size="8" text-anchor="middle">-45°</text><text x="30" y="85" font-size="8" text-anchor="middle">-60°</text></svg>');
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+            transform-origin: center;
+            transition: transform 0.1s;
+        }
+
+        .ruler {
+            position: absolute;
+            width: 200px;
+            height: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="30"><rect width="200" height="30" fill="%23f9f9f9" stroke="%23333" stroke-width="1"/><line x1="0" y1="15" x2="200" y2="15" stroke="%23333" stroke-width="1"/><text x="10" y="10" font-size="8">0</text><text x="190" y="10" font-size="8">20</text><text x="100" y="10" font-size="8">10</text><line x1="20" y1="10" x2="20" y2="20" stroke="%23333" stroke-width="1"/><line x1="40" y1="10" x2="40" y2="20" stroke="%23333" stroke-width="1"/><line x1="60" y1="10" x2="60" y2="20" stroke="%23333" stroke-width="1"/><line x1="80" y1="10" x2="80" y2="20" stroke="%23333" stroke-width="1"/><line x1="120" y1="10" x2="120" y2="20" stroke="%23333" stroke-width="1"/><line x1="140" y1="10" x2="140" y2="20" stroke="%23333" stroke-width="1"/><line x1="160" y1="10" x2="160" y2="20" stroke="%23333" stroke-width="1"/><line x1="180" y1="10" x2="180" y2="20" stroke="%23333" stroke-width="1"/><line x1="5" y1="5" x2="5" y2="25" stroke="%23333" stroke-width="1"/><line x1="195" y1="5" x2="195" y2="25" stroke="%23333" stroke-width="1"/><line x1="50" y1="5" x2="50" y2="25" stroke="%23333" stroke-width="1"/><line x1="150" y1="5" x2="150" y2="25" stroke="%23333" stroke-width="1"/></svg>');
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+            transform-origin: center;
+            transition: transform 0.1s;
+        }
+
+        .compass {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(52, 152, 219, 0.5);
+            border-radius: 50%;
+            border: 2px solid #3498db;
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+        }
+
+        .center-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            z-index: 20;
+            display: none;
+        }
+
         .header {
             text-align: center;
             margin-bottom: 40px;
@@ -38,7 +149,7 @@
             color: white;
             font-size: 2.5em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
@@ -64,12 +175,12 @@
             font-size: 1.1em;
             font-weight: bold;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .lesson-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .lesson-btn.active {
@@ -80,7 +191,7 @@
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             margin-bottom: 30px;
         }
 
@@ -187,7 +298,7 @@
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .question-number {
@@ -259,7 +370,6 @@
             font-size: 1.1em;
             font-weight: bold;
             transition: all 0.3s ease;
-            disabled: opacity 0.5;
         }
 
         .next-btn:hover:not(:disabled) {
@@ -306,25 +416,59 @@
             margin-top: 20px;
         }
 
+        .construction-feedback {
+            background: #e9f7ef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .construction-feedback.show {
+            display: block;
+        }
+
+        .construction-feedback.success {
+            border-left: 5px solid #4CAF50;
+        }
+
+        .construction-feedback.error {
+            border-left: 5px solid #f44336;
+        }
+
+        .construction-guide {
+            background: #f0f4f8;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #34495e;
+        }
+
         @media (max-width: 768px) {
             .lesson-selector {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .lesson-btn {
                 width: 100%;
                 max-width: 300px;
             }
-            
+
             .quiz-controls {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .quiz-btn {
                 width: 100%;
                 max-width: 200px;
+            }
+
+            canvas {
+                width: 100%;
+                height: 400px;
             }
         }
 
@@ -333,49 +477,66 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔺 Interactive Geometry Learning</h1>
-            <p>Master Triangle Construction & Perpendicular Bisectors</p>
+            <h1>🔺 Geomaster: An Interactive Website for Geometric Constructions</h1>
+            <p>Master Geometric Constructions with Interactive Tools</p>
         </div>
 
+        <div class="tools">
+            <button id="pointer-btn">Pointer</button>
+            <button id="line-btn">Line</button>
+            <button id="point-btn">Point</button>
+            <button id="compass-btn">Compass</button>
+            <button id="protractor-btn">Protractor</button>
+            <button id="ruler-btn">Ruler</button>
+             <button id="clear-btn">Clear</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="construction-canvas" width="800" height="500"></canvas>
+            <div class="protractor" id="protractor"></div>
+            <div class="ruler" id="ruler"></div>
+            <div class="compass" id="compass"></div>
+            <div class="center-handle" id="protractor-handle"></div>
+            <div class="center-handle" id="ruler-handle"></div>
+            <div class="center-handle" id="compass-handle"></div>
+          </div>
+
         <div class="lesson-selector">
-            <button class="lesson-btn active" onclick="showLesson(1)">
-                📐 Perpendicular Bisector
-            </button>
-            <button class="lesson-btn" onclick="showLesson(2)">
-                🔺 Triangle Construction (SSS, SAS, ASA)
-            </button>
-            <button class="lesson-btn" onclick="showLesson(3)">
-                📏 Triangle from Side Lengths
-            </button>
+            <button class="lesson-btn active" onclick="showLesson(1)">📐 Perpendicular Bisector</button>
+            <button class="lesson-btn" onclick="showLesson(2)">🔺 Triangle Construction (SSS, SAS, ASA)</button>
+            <button class="lesson-btn" onclick="showLesson(3)">📏 Triangle from Side Lengths</button>
         </div>
 
         <div class="content-area">
-            <!-- Lesson 1: Perpendicular Bisector -->
             <div id="lesson1" class="lesson-content active">
                 <h2 class="lesson-title">Perpendicular Bisector</h2>
-                
                 <div class="procedure-section">
                     <h3>📋 Construction Procedure</h3>
-                    <p><strong>Given:</strong> A line segment AB</p>
+                    <p><strong>Goal:</strong> Construct a line that bisects segment AB at a 90° angle</p>
                     <ol class="steps">
-                        <li>Draw the given line segment using a ruler and label the endpoints as A and B.</li>
-                        <li>Place the compass at point A and open it to more than half of AB but less than its full length.</li>
-                        <li>Draw an arc above and below the line.</li>
-                        <li>Without changing the compass width, place it at point B and draw another arc above and below AB, ensuring these arcs intersect the first ones.</li>
-                        <li>Mark the points of intersection of the arcs and label them as X and Y.</li>
-                        <li>Draw a straight line through X and Y using a ruler. This line is the perpendicular bisector of AB.</li>
-                        <li>Verify the construction: The bisector should divide AB into two equal parts and form a 90° angle with AB at the midpoint.</li>
+                        <li>Draw a line segment and label its endpoints as A and B.</li>
+                        <li>Use the compass tool to set a radius greater than half of AB's length.</li>
+                        <li>Place the compass at point A and draw two arcs (above and below the segment).</li>
+                        <li>Without changing the compass width, place it at point B and draw two arcs intersecting the previous arcs.</li>
+                        <li>Label the intersection points as X and Y.</li>
+                        <li>Draw a line through X and Y using the line tool. This is the perpendicular bisector.</li>
+                        <li>Click "Check Construction" to verify your work.</li>
                     </ol>
                 </div>
-
                 <div class="activity-section">
                     <h3 class="activity-title">🎯 Key Concepts</h3>
                     <ul>
@@ -387,41 +548,39 @@
                 </div>
             </div>
 
-            <!-- Lesson 2: Triangle Construction -->
             <div id="lesson2" class="lesson-content">
                 <h2 class="lesson-title">Triangle Construction (SSS, SAS, ASA)</h2>
-                
                 <div class="procedure-section">
                     <h3>📋 SSS (Side-Side-Side) Construction</h3>
                     <ol class="steps">
-                        <li>Draw the longest given side as the base using a ruler and label it AB.</li>
-                        <li>Set the compass to the length of the second side, place it at A, and draw an arc.</li>
-                        <li>Set the compass to the length of the third side, place it at B, and draw another arc that intersects the first arc.</li>
-                        <li>Mark the intersection point as C. This is the third vertex of the triangle.</li>
-                        <li>Connect points A, B, and C using a ruler to complete the triangle.</li>
+                        <li>Draw the longest side using the ruler and label it AB.</li>
+                        <li>Set the compass to the second side length, place it at A, and draw an arc.</li>
+                        <li>Set the compass to the third side length, place it at B, and draw an arc intersecting the first arc.</li>
+                        <li>Label the intersection as C.</li>
+                        <li>Connect A, B, and C using the line tool.</li>
+                        <li>Click "Check Construction" to verify.</li>
                     </ol>
                 </div>
-
                 <div class="procedure-section">
                     <h3>📋 SAS (Side-Angle-Side) Construction</h3>
                     <ol class="steps">
-                        <li>Draw the given side as the base using a ruler and label it AB.</li>
-                        <li>Use a protractor at A to mark the given angle and draw a ray extending outward.</li>
-                        <li>Set the compass to the length of the second given side, place it at A, and mark the second side's length on the ray.</li>
-                        <li>Connect the new point to B to complete the triangle.</li>
+                        <li>Draw a side using the ruler and label it AB.</li>
+                        <li>Use the protractor at A to mark the given angle and draw a ray.</li>
+                        <li>Set the compass to the second side length, place it at A, and mark a point on the ray (C).</li>
+                        <li>Connect C to B using the line tool.</li>
+                        <li>Click "Check Construction" to verify.</li>
                     </ol>
                 </div>
-
                 <div class="procedure-section">
                     <h3>📋 ASA (Angle-Side-Angle) Construction</h3>
                     <ol class="steps">
-                        <li>Draw the given side as the base using a ruler and label it AB.</li>
-                        <li>Use a protractor at A and B to mark the given angles and draw rays extending from these angles.</li>
-                        <li>Find the intersection of the two rays and mark it as C.</li>
-                        <li>Connect points A, B, and C using a ruler to complete the triangle.</li>
+                        <li>Draw a side using the ruler and label it AB.</li>
+                        <li>Use the protractor at A and B to mark the given angles and draw rays.</li>
+                        <li>Label the rays' intersection as C.</li>
+                        <li>Connect A, B, and C using the line tool.</li>
+                        <li>Click "Check Construction" to verify.</li>
                     </ol>
                 </div>
-
                 <div class="activity-section">
                     <h3 class="activity-title">🎯 Key Concepts</h3>
                     <ul>
@@ -433,23 +592,20 @@
                 </div>
             </div>
 
-            <!-- Lesson 3: Triangle from Side Lengths -->
             <div id="lesson3" class="lesson-content">
                 <h2 class="lesson-title">Constructing a Triangle Given Its Side Lengths</h2>
-                
                 <div class="procedure-section">
                     <h3>📋 Construction Procedure</h3>
-                    <p><strong>Given:</strong> Three side lengths</p>
+                    <p><strong>Given:</strong> Three side lengths (e.g., 6cm, 8cm, 10cm)</p>
                     <ol class="steps">
-                        <li>Draw the longest side first using a ruler and label it AB.</li>
+                        <li>Draw the longest side using the ruler and label it AB.</li>
                         <li>Set the compass to the second side length, place it at A, and draw an arc.</li>
-                        <li>Set the compass to the third side length, place it at B, and draw another arc.</li>
-                        <li>Mark the intersection of the arcs and label it as C.</li>
-                        <li>Connect points A, B, and C using a ruler to complete the triangle.</li>
-                        <li>Check if the triangle satisfies the triangle inequality theorem: the sum of any two sides must be greater than the third side.</li>
+                        <li>Set the compass to the third side length, place it at B, and draw an arc intersecting the first arc.</li>
+                        <li>Label the intersection as C.</li>
+                        <li>Connect A, B, and C using the line tool.</li>
+                        <li>Click "Check Construction" to verify.</li>
                     </ol>
                 </div>
-
                 <div class="activity-section">
                     <h3 class="activity-title">🎯 Triangle Inequality Theorem</h3>
                     <p>For any triangle with sides a, b, and c:</p>
@@ -458,7 +614,7 @@
                         <li>a + c > b</li>
                         <li>b + c > a</li>
                     </ul>
-                    <p>If any of these conditions are not met, the triangle cannot be constructed.</p>
+                    <p>If any condition fails, the triangle cannot be constructed.</p>
                 </div>
             </div>
         </div>
@@ -466,36 +622,31 @@
         <div class="quiz-section">
             <div class="quiz-header">
                 <h2>🎮 Interactive Quiz Game</h2>
-                <p>Test your knowledge with shuffled questions!</p>
+                <p>Test your geometry knowledge with engaging quizzes!</p>
             </div>
-
             <div class="quiz-controls">
                 <button class="quiz-btn" onclick="startQuiz(1)">Quiz: Perpendicular Bisector</button>
                 <button class="quiz-btn" onclick="startQuiz(2)">Quiz: Triangle Construction</button>
                 <button class="quiz-btn" onclick="startQuiz(3)">Quiz: Side Lengths</button>
                 <button class="quiz-btn" onclick="startMixedQuiz()">Mixed Quiz</button>
             </div>
-
             <div id="quiz-container" style="display: none;">
                 <div class="score-display">
                     <span id="score-text">Score: 0/0</span>
                 </div>
-                
                 <div id="question-container"></div>
-                
                 <div class="quiz-footer">
                     <button id="next-btn" class="next-btn" onclick="nextQuestion()" disabled>Next Question</button>
                 </div>
             </div>
-
             <div id="final-score" class="final-score" style="display: none;"></div>
         </div>
     </div>
 
     <script>
-        // Question data
+        // Question data (unchanged)
         const questions = {
-            1: [ // Perpendicular Bisector
+            1: [
                 {
                     question: "What does a perpendicular bisector do to a line segment?",
                     options: ["Cuts it into two unequal parts", "Passes through its midpoint at a right angle", "Extends the segment indefinitely", "Connects the endpoints of the segment"],
@@ -597,7 +748,7 @@
                     correct: 1
                 }
             ],
-            2: [ // Triangle Construction
+            2: [
                 {
                     question: "Which of the following is NOT a valid triangle construction method?",
                     options: ["SSS (Side-Side-Side)", "SAS (Side-Angle-Side)", "SSA (Side-Side-Angle)", "ASA (Angle-Side-Angle)"],
@@ -699,7 +850,7 @@
                     correct: 0
                 }
             ],
-            3: [ // Side Lengths
+            3: [
                 {
                     question: "What is the first step in constructing a triangle given its three side lengths?",
                     options: ["Draw any random triangle", "Measure and draw the longest side first", "Draw all three sides at the same time", "Use a protractor to measure angles"],
@@ -809,27 +960,24 @@
         let score = 0;
         let selectedAnswer = null;
         let quizActive = false;
+        let currentLesson = 1;
 
         // Show lesson function
         function showLesson(lessonNum) {
-            // Hide all lessons
+            currentLesson = lessonNum;
             document.querySelectorAll('.lesson-content').forEach(lesson => {
                 lesson.classList.remove('active');
             });
-            
-            // Show selected lesson
             document.getElementById(`lesson${lessonNum}`).classList.add('active');
-            
-            // Update button states
             document.querySelectorAll('.lesson-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
-            
-            // Hide quiz if active
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('final-score').style.display = 'none';
             quizActive = false;
+            clearCanvas();
+            updateGuide();
         }
 
         // Shuffle array function
@@ -844,30 +992,26 @@
 
         // Start quiz function
         function startQuiz(lessonNum) {
-            currentQuiz = shuffleArray(questions[lessonNum]);
+            currentQuiz = shuffleArray(questions[lessonNum]).slice(0, 10);
             currentQuestionIndex = 0;
             score = 0;
             selectedAnswer = null;
             quizActive = true;
-            
             document.getElementById('quiz-container').style.display = 'block';
             document.getElementById('final-score').style.display = 'none';
-            
             showQuestion();
         }
 
         // Start mixed quiz function
         function startMixedQuiz() {
             const allQuestions = [...questions[1], ...questions[2], ...questions[3]];
-            currentQuiz = shuffleArray(allQuestions).slice(0, 20); // Take 20 random questions
+            currentQuiz = shuffleArray(allQuestions).slice(0, 15);
             currentQuestionIndex = 0;
             score = 0;
             selectedAnswer = null;
             quizActive = true;
-            
             document.getElementById('quiz-container').style.display = 'block';
             document.getElementById('final-score').style.display = 'none';
-            
             showQuestion();
         }
 
@@ -880,7 +1024,6 @@
 
             const question = currentQuiz[currentQuestionIndex];
             const questionContainer = document.getElementById('question-container');
-            
             questionContainer.innerHTML = `
                 <div class="question-card fade-in">
                     <div class="question-number">Question ${currentQuestionIndex + 1} of ${currentQuiz.length}</div>
@@ -894,47 +1037,34 @@
                     </div>
                 </div>
             `;
-            
-            // Update score display
             document.getElementById('score-text').textContent = `Score: ${score}/${currentQuestionIndex}`;
-            
-            // Reset next button
             document.getElementById('next-btn').disabled = true;
             selectedAnswer = null;
         }
 
         // Select answer function
         function selectAnswer(answerIndex) {
-            if (selectedAnswer !== null) return; // Prevent multiple selections
-            
+            if (selectedAnswer !== null) return;
             selectedAnswer = answerIndex;
             const options = document.querySelectorAll('.option');
             const question = currentQuiz[currentQuestionIndex];
-            
-            // Show correct/incorrect answers
             options.forEach((option, index) => {
                 if (index === question.correct) {
                     option.classList.add('correct');
                 } else if (index === answerIndex && answerIndex !== question.correct) {
                     option.classList.add('incorrect');
                 }
-                option.style.pointerEvents = 'none'; // Disable further clicks
+                option.style.pointerEvents = 'none';
             });
-            
-            // Update score
             if (answerIndex === question.correct) {
                 score++;
             }
-            
-            // Enable next button
             document.getElementById('next-btn').disabled = false;
-            
-            // Auto-advance after 2 seconds
             setTimeout(() => {
                 if (quizActive) {
                     nextQuestion();
                 }
-            }, 2000);
+            }, 1500);
         }
 
         // Next question function
@@ -946,28 +1076,25 @@
         // Show final score function
         function showFinalScore() {
             document.getElementById('quiz-container').style.display = 'none';
-            
             const percentage = Math.round((score / currentQuiz.length) * 100);
             let message = '';
             let emoji = '';
-            
             if (percentage >= 90) {
-                message = 'Excellent! You have mastered the concepts!';
+                message = 'Outstanding! You are a geometry master!';
                 emoji = '🏆';
             } else if (percentage >= 80) {
-                message = 'Great job! You have a solid understanding!';
+                message = 'Great job! You have a strong grasp of the concepts!';
                 emoji = '🎉';
             } else if (percentage >= 70) {
-                message = 'Good work! Keep practicing to improve!';
+                message = 'Good effort! Keep practicing to excel!';
                 emoji = '👍';
             } else if (percentage >= 60) {
-                message = 'Fair effort! Review the lessons and try again!';
+                message = 'Nice try! Review the lessons to improve!';
                 emoji = '📚';
             } else {
-                message = 'Keep studying! Practice makes perfect!';
+                message = 'Keep practicing! You will get there!';
                 emoji = '💪';
             }
-            
             document.getElementById('final-score').innerHTML = `
                 <div class="fade-in">
                     <h2>${emoji} Quiz Complete!</h2>
@@ -978,14 +1105,572 @@
                     </button>
                 </div>
             `;
-            
             document.getElementById('final-score').style.display = 'block';
             quizActive = false;
         }
 
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add some interactive animations
+        // Canvas and construction logic
+        document.addEventListener('DOMContentLoaded', function () {
+            const canvas = document.getElementById('construction-canvas');
+            const ctx = canvas.getContext('2d');
+            const protractor = document.getElementById('protractor');
+            const ruler = document.getElementById('ruler');
+            const compass = document.getElementById('compass');
+            const protractorHandle = document.getElementById('protractor-handle');
+            const rulerHandle = document.getElementById('ruler-handle');
+            const compassHandle = document.getElementById('compass-handle');
+            const feedback = document.getElementById('feedback');
+            const guide = document.getElementById('guide');
+
+            let currentTool = 'pointer';
+            let isDrawing = false;
+            let startX, startY;
+            let points = [];
+            let lines = [];
+            let arcs = [];
+            let currentLine = null;
+            let draggedElement = null;
+            let protractorVisible = false;
+            let rulerVisible = false;
+            let compassVisible = false;
+            let protractorAngle = 0;
+            let rulerAngle = 0;
+            let compassRadius = 50;
+            let isRotating = false;
+            let constructionStep = 0;
+
+            // Tool buttons
+            document.getElementById('pointer-btn').addEventListener('click', () => setTool('pointer'));
+            document.getElementById('line-btn').addEventListener('click', () => setTool('line'));
+            document.getElementById('point-btn').addEventListener('click', () => setTool('point'));
+            document.getElementById('compass-btn').addEventListener('click', toggleCompass);
+            document.getElementById('protractor-btn').addEventListener('click', toggleProtractor);
+            document.getElementById('ruler-btn').addEventListener('click', toggleRuler);
+             document.getElementById('clear-btn').addEventListener('click', clearCanvas);
+
+            function setTool(tool) {
+                currentTool = tool;
+                document.querySelectorAll('.tools button').forEach(btn => {
+                    btn.classList.remove('active-tool');
+                    btn.classList.remove('tool-active');
+                });
+                document.getElementById(`${tool}-btn`).classList.add('active-tool');
+                protractorHandle.style.display = 'none';
+                rulerHandle.style.display = 'none';
+                compassHandle.style.display = 'none';
+                updateGuide();
+            }
+
+            function toggleProtractor() {
+                protractorVisible = !protractorVisible;
+                protractor.style.display = protractorVisible ? 'block' : 'none';
+                document.getElementById('protractor-btn').classList.toggle('tool-active', protractorVisible);
+                if (protractorVisible) {
+                    setTool('protractor');
+                    if (!protractor.style.left) {
+                        const rect = canvas.getBoundingClientRect();
+                        protractor.style.left = `${rect.width / 2 - 100}px`;
+                        protractor.style.top = `${rect.height / 2 - 100}px`;
+                    }
+                    updateProtractorHandlePosition();
+                    protractorHandle.style.display = 'block';
+                } else {
+                    setTool('pointer');
+                }
+                updateGuide();
+            }
+
+            function toggleRuler() {
+                rulerVisible = !rulerVisible;
+                ruler.style.display = rulerVisible ? 'block' : 'none';
+                document.getElementById('ruler-btn').classList.toggle('tool-active', rulerVisible);
+                if (rulerVisible) {
+                    setTool('ruler');
+                    if (!ruler.style.left) {
+                        const rect = canvas.getBoundingClientRect();
+                        ruler.style.left = `${rect.width / 2 - 100}px`;
+                        ruler.style.top = `${rect.height / 2 - 15}px`;
+                    }
+                    updateRulerHandlePosition();
+                    rulerHandle.style.display = 'block';
+                } else {
+                    setTool('pointer');
+                }
+                updateGuide();
+            }
+
+            function toggleCompass() {
+                compassVisible = !compassVisible;
+                compass.style.display = compassVisible ? 'block' : 'none';
+                document.getElementById('compass-btn').classList.toggle('tool-active', compassVisible);
+                if (compassVisible) {
+                    setTool('compass');
+                    if (!compass.style.left) {
+                        const rect = canvas.getBoundingClientRect();
+                        compass.style.left = `${rect.width / 2 - 10}px`;
+                        compass.style.top = `${rect.height / 2 - 10}px`;
+                    }
+                    updateCompassHandlePosition();
+                    compassHandle.style.display = 'block';
+                } else {
+                    setTool('pointer');
+                }
+                updateGuide();
+            }
+
+            function updateProtractorHandlePosition() {
+                const protractorRect = protractor.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                protractorHandle.style.left = `${protractorRect.left + protractorRect.width / 2 - canvasRect.left - 5}px`;
+                protractorHandle.style.top = `${protractorRect.top + protractorRect.height / 2 - canvasRect.top - 5}px`;
+            }
+
+            function updateRulerHandlePosition() {
+                const rulerRect = ruler.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                rulerHandle.style.left = `${rulerRect.left + rulerRect.width / 2 - canvasRect.left - 5}px`;
+                rulerHandle.style.top = `${rulerRect.top + rulerRect.height / 2 - canvasRect.top - 5}px`;
+            }
+
+            function updateCompassHandlePosition() {
+                const compassRect = compass.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                compassHandle.style.left = `${compassRect.left + compassRect.width / 2 - canvasRect.left - 5}px`;
+                compassHandle.style.top = `${compassRect.top + compassRect.height / 2 - canvasRect.top - 5}px`;
+            }
+
+            function updateGuide() {
+                const guides = {
+                    1: [
+                        "Draw a line segment using the line tool and label its endpoints as A and B.",
+                        "Select the compass tool and set its radius to more than half the length of AB.",
+                        "Place the compass at point A and draw two arcs (above and below).",
+                        "Keep the compass radius, place it at point B, and draw two intersecting arcs.",
+                        "Label the intersection points as X and Y.",
+                        "Draw a line through X and Y using the line tool.",
+                        "Click 'Check Construction' to verify."
+                    ],
+                    2: [
+                        "For SSS: Draw the longest side with the ruler and label it AB.",
+                        "Set the compass to the second side length and draw an arc from A.",
+                        "Set the compass to the third side length and draw an arc from B.",
+                        "Label the intersection as C and connect A, B, C with the line tool.",
+                        "For SAS: Draw a side, use the protractor at A for the angle, mark the second side with the compass, and connect.",
+                        "For ASA: Draw a side, use the protractor at A and B for angles, find the rays' intersection as C, and connect."
+                    ],
+                    3: [
+                        "Draw the longest side using the ruler and label it AB.",
+                        "Set the compass to the second side length and draw an arc from A.",
+                        "Set the compass to the third side length and draw an arc from B.",
+                        "Label the intersection as C and connect A, B, C with the line tool.",
+                        "Click 'Check Construction' to verify."
+                    ]
+                };
+                guide.innerHTML = `<strong>Step ${constructionStep + 1}:</strong> ${guides[currentLesson][constructionStep] || "Follow the procedure steps."}`;
+            }
+
+            function clearCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                points = [];
+                lines = [];
+                arcs = [];
+                currentLine = null;
+                constructionStep = 0;
+                feedback.classList.remove('show', 'success', 'error');
+                feedback.innerHTML = '';
+                updateGuide();
+            }
+
+            function drawPoint(x, y, label = '') {
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+                ctx.stroke();
+                if (label) {
+                    ctx.font = '12px Arial';
+                    ctx.fillStyle = 'black';
+                    ctx.fillText(label, x + 8, y + 3);
+                }
+            }
+
+            function drawLine(x1, y1, x2, y2) {
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = 'blue';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            function drawArc(x, y, radius, startAngle = 0, endAngle = Math.PI * 2) {
+                ctx.beginPath();
+                ctx.arc(x, y, radius, startAngle, endAngle);
+                ctx.strokeStyle = 'green';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            function redrawCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                lines.forEach(line => drawLine(line.x1, line.y1, line.x2, line.y2));
+                arcs.forEach(arc => drawArc(arc.x, arc.y, arc.radius));
+                points.forEach(point => drawPoint(point.x, point.y, point.label));
+                if (currentLine) {
+                    drawLine(currentLine.x1, currentLine.y1, currentLine.x2, currentLine.y2);
+                }
+            }
+
+            function getMousePos(canvas, evt) {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: evt.clientX - rect.left,
+                    y: evt.clientY - rect.top
+                };
+            }
+
+            function isPointNearLine(x, y, line) {
+                const A = x - line.x1;
+                const B = y - line.y1;
+                const C = line.x2 - line.x1;
+                const D = line.y2 - line.y1;
+                const dot = A * C + B * D;
+                const len_sq = C * C + D * D;
+                let param = -1;
+                if (len_sq !== 0) {
+                    param = dot / len_sq;
+                }
+                let xx, yy;
+                if (param < 0) {
+                    xx = line.x1;
+                    yy = line.y1;
+                } else if (param > 1) {
+                    xx = line.x2;
+                    yy = line.y2;
+                } else {
+                    xx = line.x1 + param * C;
+                    yy = line.y1 + param * D;
+                }
+                const dx = x - xx;
+                const dy = y - yy;
+                return Math.sqrt(dx * dx + dy * dy) < 10;
+            }
+
+            function isPointNearPoint(x, y, point) {
+                const dx = x - point.x;
+                const dy = y - point.y;
+                return Math.sqrt(dx * dx + dy * dy) < 10;
+            }
+
+            function checkConstruction() {
+                feedback.classList.remove('success', 'error');
+                feedback.classList.add('show');
+                if (currentLesson === 1) {
+                    if (lines.length < 2 || points.length < 4) {
+                        feedback.classList.add('error');
+                        feedback.innerHTML = 'Incomplete construction. Ensure you have a segment AB, two intersection points X and Y, and a bisector line.';
+                        return;
+                    }
+                    const segment = lines[0];
+                    const bisector = lines[lines.length - 1];
+                    const midX = (segment.x1 + segment.x2) / 2;
+                    const midY = (segment.y1 + segment.y2) / 2;
+                    const isPerpendicular = Math.abs(
+                        ((bisector.x2 - bisector.x1) * (segment.x2 - segment.x1) +
+                        (bisector.y2 - bisector.y1) * (segment.y2 - segment.y1)) /
+                        (Math.sqrt((bisector.x2 - bisector.x1) ** 2 + (bisector.y2 - bisector.y1) ** 2) *
+                        Math.sqrt((segment.x2 - segment.x1) ** 2 + (segment.y2 - segment.y1) ** 2))
+                    ) < 0.1;
+                    const isMidpoint = isPointNearPoint(midX, midY, {
+                        x: (bisector.x1 + bisector.x2) / 2,
+                        y: (bisector.y1 + bisector.y2) / 2
+                    });
+                    if (isPerpendicular && isMidpoint) {
+                        feedback.classList.add('success');
+                        feedback.innerHTML = 'Correct! The bisector is perpendicular and passes through the midpoint.';
+                        constructionStep = guides[1].length - 1;
+                    } else {
+                        feedback.classList.add('error');
+                        feedback.innerHTML = 'Incorrect. Check that the bisector is perpendicular to AB and passes through its midpoint.';
+                    }
+                } else if (currentLesson === 2 || currentLesson === 3) {
+                    if (lines.length < 3 || points.length < 3) {
+                        feedback.classList.add('error');
+                        feedback.innerHTML = 'Incomplete triangle. Ensure you have three vertices (A, B, C) and three sides.';
+                        return;
+                    }
+                    const sides = lines.slice(-3);
+                    const lengths = sides.map(line => 
+                        Math.sqrt((line.x2 - line.x1) ** 2 + (line.y2 - line.y1) ** 2)
+                    );
+                    const [a, b, c] = lengths.sort((x, y) => x - y);
+                    if (a + b > c) {
+                        feedback.classList.add('success');
+                        feedback.innerHTML = 'Correct! The sides form a valid triangle.';
+                        constructionStep = guides[currentLesson].length - 1;
+                    } else {
+                        feedback.classList.add('error');
+                        feedback.innerHTML = 'Invalid triangle. Check the triangle inequality theorem.';
+                    }
+                }
+                updateGuide();
+            }
+
+            canvas.addEventListener('mousedown', function (e) {
+                const mousePos = getMousePos(canvas, e);
+                if (currentTool === 'pointer') {
+                    for (let i = 0; i < lines.length; i++) {
+                        if (isPointNearLine(mousePos.x, mousePos.y, lines[i])) {
+                            draggedElement = { type: 'line', index: i, offsetX: mousePos.x - lines[i].x1, offsetY: mousePos.y - lines[i].y1 };
+                            return;
+                        }
+                    }
+                    for (let i = 0; i < points.length; i++) {
+                        if (isPointNearPoint(mousePos.x, mousePos.y, points[i])) {
+                            draggedElement = { type: 'point', index: i };
+                            return;
+                        }
+                    }
+                }
+                if (currentTool === 'line') {
+                    isDrawing = true;
+                    startX = mousePos.x;
+                    startY = mousePos.y;
+                    currentLine = { x1: startX, y1: startY, x2: startX, y2: startY };
+                    constructionStep = Math.min(constructionStep + 1, guides[currentLesson].length - 1);
+                    updateGuide();
+                }
+                if (currentTool === 'point') {
+                    points.push({ x: mousePos.x, y: mousePos.y, label: String.fromCharCode(65 + points.length) });
+                    redrawCanvas();
+                    constructionStep = Math.min(constructionStep + 1, guides[currentLesson].length - 1);
+                    updateGuide();
+                }
+                if (currentTool === 'protractor' && protractorVisible) {
+                    const handleRect = protractorHandle.getBoundingClientRect();
+                    const handleCenter = {
+                        x: handleRect.left + handleRect.width / 2,
+                        y: handleRect.top + handleRect.height / 2
+                    };
+                    const distance = Math.sqrt(
+                        Math.pow(e.clientX - handleCenter.x, 2) +
+                        Math.pow(e.clientY - handleCenter.y, 2)
+                    );
+                    if (distance < 15) {
+                        draggedElement = {
+                            type: 'protractor-move',
+                            startX: e.clientX,
+                            startY: e.clientY,
+                            initialLeft: parseInt(protractor.style.left),
+                            initialTop: parseInt(protractor.style.top)
+                        };
+                        isRotating = false;
+                    } else {
+                        const protractorRect = protractor.getBoundingClientRect();
+                        const protractorCenter = {
+                            x: protractorRect.left + protractorRect.width / 2,
+                            y: protractorRect.top + protractorRect.height / 2
+                        };
+                        const angle = Math.atan2(
+                            e.clientY - protractorCenter.y,
+                            e.clientX - protractorCenter.x
+                        );
+                        draggedElement = {
+                            type: 'protractor-rotate',
+                            startAngle: angle,
+                            initialRotation: protractorAngle
+                        };
+                        isRotating = true;
+                    }
+                }
+                if (currentTool === 'ruler' && rulerVisible) {
+                    const handleRect = rulerHandle.getBoundingClientRect();
+                    const handleCenter = {
+                        x: handleRect.left + handleRect.width / 2,
+                        y: handleRect.top + handleRect.height / 2
+                    };
+                    const distance = Math.sqrt(
+                        Math.pow(e.clientX - handleCenter.x, 2) +
+                        Math.pow(e.clientY - handleCenter.y, 2)
+                    );
+                    if (distance < 15) {
+                        draggedElement = {
+                            type: 'ruler-move',
+                            startX: e.clientX,
+                            startY: e.clientY,
+                            initialLeft: parseInt(ruler.style.left),
+                            initialTop: parseInt(ruler.style.top)
+                        };
+                        isRotating = false;
+                    } else {
+                        const rulerRect = ruler.getBoundingClientRect();
+                        const rulerCenter = {
+                            x: rulerRect.left + rulerRect.width / 2,
+                            y: rulerRect.top + rulerRect.height / 2
+                        };
+                        const angle = Math.atan2(
+                            e.clientY - rulerCenter.y,
+                            e.clientX - rulerCenter.x
+                        );
+                        draggedElement = {
+                            type: 'ruler-rotate',
+                            startAngle: angle,
+                            initialRotation: rulerAngle
+                        };
+                        isRotating = true;
+                    }
+                }
+                if (currentTool === 'compass' && compassVisible) {
+                    const handleRect = compassHandle.getBoundingClientRect();
+                    const handleCenter = {
+                        x: handleRect.left + handleRect.width / 2,
+                        y: handleRect.top + handleRect.height / 2
+                    };
+                    const distance = Math.sqrt(
+                        Math.pow(e.clientX - handleCenter.x, 2) +
+                        Math.pow(e.clientY - handleCenter.y, 2)
+                    );
+                    if (distance < 15) {
+                        draggedElement = {
+                            type: 'compass-move',
+                            startX: e.clientX,
+                            startY: e.clientY,
+                            initialLeft: parseInt(compass.style.left),
+                            initialTop: parseInt(compass.style.top)
+                        };
+                    } else {
+                        const compassRect = compass.getBoundingClientRect();
+                        const compassCenter = {
+                            x: compassRect.left + compassRect.width / 2,
+                            y: compassRect.top + compassRect.height / 2
+                        };
+                        compassRadius = Math.sqrt(
+                            Math.pow(e.clientX - compassCenter.x, 2) +
+                            Math.pow(e.clientY - compassCenter.y, 2)
+                        );
+                        compass.style.width = `${compassRadius * 2}px`;
+                        compass.style.height = `${compassRadius * 2}px`;
+                        compass.style.left = `${parseInt(compass.style.left) - (compassRadius - 10)}px`;
+                        compass.style.top = `${parseInt(compass.style.top) - (compassRadius - 10)}px`;
+                        updateCompassHandlePosition();
+                        arcs.push({ x: parseInt(compass.style.left) + compassRadius, y: parseInt(compass.style.top) + compassRadius, radius: compassRadius });
+                        redrawCanvas();
+                        constructionStep = Math.min(constructionStep + 1, guides[currentLesson].length - 1);
+                        updateGuide();
+                    }
+                }
+            });
+
+            canvas.addEventListener('mousemove', function (e) {
+                const mousePos = getMousePos(canvas, e);
+                if (currentTool === 'pointer' && draggedElement) {
+                    if (draggedElement.type === 'line') {
+                        const line = lines[draggedElement.index];
+                        const dx = mousePos.x - draggedElement.offsetX - line.x1;
+                        const dy = mousePos.y - draggedElement.offsetY - line.y1;
+                        line.x1 += dx;
+                        line.y1 += dy;
+                        line.x2 += dx;
+                        line.y2 += dy;
+                        redrawCanvas();
+                    } else if (draggedElement.type === 'point') {
+                        points[draggedElement.index].x = mousePos.x;
+                        points[draggedElement.index].y = mousePos.y;
+                        redrawCanvas();
+                    }
+                    return;
+                }
+                if (currentTool === 'line' && isDrawing) {
+                    currentLine.x2 = mousePos.x;
+                    currentLine.y2 = mousePos.y;
+                    redrawCanvas();
+                }
+                if (currentTool === 'protractor' && protractorVisible && draggedElement) {
+                    if (draggedElement.type === 'protractor-move') {
+                        const dx = e.clientX - draggedElement.startX;
+                        const dy = e.clientY - draggedElement.startY;
+                        protractor.style.left = `${draggedElement.initialLeft + dx}px`;
+                        protractor.style.top = `${draggedElement.initialTop + dy}px`;
+                        updateProtractorHandlePosition();
+                    } else if (draggedElement.type === 'protractor-rotate') {
+                        const protractorRect = protractor.getBoundingClientRect();
+                        const protractorCenter = {
+                            x: protractorRect.left + protractorRect.width / 2,
+                            y: protractorRect.top + protractorRect.height / 2
+                        };
+                        const currentAngle = Math.atan2(
+                            e.clientY - protractorCenter.y,
+                            e.clientX - protractorCenter.x
+                        );
+                        const angleDiff = currentAngle - draggedElement.startAngle;
+                        protractorAngle = draggedElement.initialRotation + angleDiff * (180 / Math.PI);
+                        protractor.style.transform = `rotate(${protractorAngle}deg)`;
+                        updateProtractorHandlePosition();
+                    }
+                }
+                if (currentTool === 'ruler' && rulerVisible && draggedElement) {
+                    if (draggedElement.type === 'ruler-move') {
+                        const dx = e.clientX - draggedElement.startX;
+                        const dy = e.clientY - draggedElement.startY;
+                        ruler.style.left = `${draggedElement.initialLeft + dx}px`;
+                        ruler.style.top = `${draggedElement.initialTop + dy}px`;
+                        updateRulerHandlePosition();
+                    } else if (draggedElement.type === 'ruler-rotate') {
+                        const rulerRect = ruler.getBoundingClientRect();
+                        const rulerCenter = {
+                            x: rulerRect.left + rulerRect.width / 2,
+                            y: rulerRect.top + rulerRect.height / 2
+                        };
+                        const currentAngle = Math.atan2(
+                            e.clientY - rulerCenter.y,
+                            e.clientX - rulerCenter.x
+                        );
+                        const angleDiff = currentAngle - draggedElement.startAngle;
+                        rulerAngle = draggedElement.initialRotation + angleDiff * (180 / Math.PI);
+                        ruler.style.transform = `rotate(${rulerAngle}deg)`;
+                        updateRulerHandlePosition();
+                    }
+                }
+                if (currentTool === 'compass' && compassVisible && draggedElement && draggedElement.type === 'compass-move') {
+                    const dx = e.clientX - draggedElement.startX;
+                    const dy = e.clientY - draggedElement.startY;
+                    compass.style.left = `${draggedElement.initialLeft + dx}px`;
+                    compass.style.top = `${draggedElement.initialTop + dy}px`;
+                    updateCompassHandlePosition();
+                }
+            });
+
+            canvas.addEventListener('mouseup', function (e) {
+                const mousePos = getMousePos(canvas, e);
+                if (currentTool === 'pointer' && draggedElement) {
+                    draggedElement = null;
+                    return;
+                }
+                if (currentTool === 'line' && isDrawing) {
+                    isDrawing = false;
+                    lines.push(currentLine);
+                    currentLine = null;
+                    redrawCanvas();
+                }
+                if ((currentTool === 'protractor' || currentTool === 'ruler' || currentTool === 'compass') && draggedElement) {
+                    draggedElement = null;
+                    isRotating = false;
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    if (protractorVisible) toggleProtractor();
+                    if (rulerVisible) toggleRuler();
+                    if (compassVisible) toggleCompass();
+                }
+            });
+
+            // Initialize
+            setTool('pointer');
+            updateGuide();
+
+            // Animation observer
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -993,7 +1678,6 @@
                     }
                 });
             });
-
             document.querySelectorAll('.procedure-section, .activity-section').forEach(section => {
                 observer.observe(section);
             });
