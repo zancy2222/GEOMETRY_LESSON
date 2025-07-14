@@ -1,0 +1,587 @@
+ 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+        }
+
+        .construction-method {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+
+        .step {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #ecf0f1;
+            border-radius: 3px;
+        }
+
+        .canvas-container {
+            margin: 15px 0;
+            text-align: center;
+            position: relative;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            background: #fff;
+            padding: 8px;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            background-color: white;
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .tools {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            position: relative;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            touch-action: manipulation;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .active-tool {
+            background-color: #2c3e50;
+            transform: scale(1.1);
+        }
+
+        .tool-active {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .instructions {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-top: 8px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .protractor {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100 20 A80 80 0 0 1 180 100 L100 100 Z" fill="%23f1c40f" fill-opacity="0.3" stroke="%23f39c12" stroke-width="1"/><circle cx="100" cy="100" r="2" fill="%23e74c3c"/><text x="100" y="30" font-size="10" text-anchor="middle">0°</text><text x="180" y="110" font-size="10" text-anchor="middle">90°</text><text x="100" y="190" font-size="10" text-anchor="middle">180°</text><text x="20" y="110" font-size="10" text-anchor="middle">-90°</text><text x="140" y="40" font-size="8" text-anchor="middle">30°</text><text x="160" y="60" font-size="8" text-anchor="middle">45°</text><text x="170" y="85" font-size="8" text-anchor="middle">60°</text><text x="60" y="40" font-size="8" text-anchor="middle">-30°</text><text x="40" y="60" font-size="8" text-anchor="middle">-45°</text><text x="30" y="85" font-size="8" text-anchor="middle">-60°</text></svg>');
+            background-size: contain;
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+            transform-origin: center;
+            transition: transform 0.1s;
+        }
+
+        .ruler {
+            position: absolute;
+            width: 150px;
+            height: 25px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="30"><rect width="200" height="30" fill="%23f9f9f9" stroke="%23333" stroke-width="1"/><line x1="0" y1="15" x2="200" y2="15" stroke="%23333" stroke-width="1"/><text x="10" y="10" font-size="8">0</text><text x="190" y="10" font-size="8">20</text><text x="100" y="10" font-size="8">10</text><line x1="20" y1="10" x2="20" y2="20" stroke="%23333" stroke-width="1"/><line x1="40" y1="10" x2="40" y2="20" stroke="%23333" stroke-width="1"/><line x1="60" y1="10" x2="60" y2="20" stroke="%23333" stroke-width="1"/><line x1="80" y1="10" x2="80" y2="20" stroke="%23333" stroke-width="1"/><line x1="120" y1="10" x2="120" y2="20" stroke="%23333" stroke-width="1"/><line x1="140" y1="10" x2="140" y2="20" stroke="%23333" stroke-width="1"/><line x1="160" y1="10" x2="160" y2="20" stroke="%23333" stroke-width="1"/><line x1="180" y1="10" x2="180" y2="20" stroke="%23333" stroke-width="1"/><line x1="5" y1="5" x2="5" y2="25" stroke="%23333" stroke-width="1"/><line x1="195" y1="5" x2="195" y2="25" stroke="%23333" stroke-width="1"/><line x1="50" y1="5" x2="50" y2="25" stroke="%23333" stroke-width="1"/><line x1="150" y1="5" x2="150" y2="25" stroke="%23333" stroke-width="1"/></svg>');
+            background-size: contain;
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+            transform-origin: center;
+            transition: transform 0.1s;
+        }
+
+        .center-handle {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            z-index: 20;
+            display: none;
+            cursor: move;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1em;
+        }
+
+        .lesson-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            min-width: 120px;
+        }
+
+        .lesson-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .lesson-btn.active {
+            background: linear-gradient(45deg, #FF6B6B, #ee5a52);
+        }
+
+        .content-area {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .lesson-content {
+            display: none;
+        }
+
+        .lesson-content.active {
+            display: block;
+        }
+
+        .lesson-title {
+            color: #4CAF50;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .procedure-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .procedure-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            margin-bottom: 10px;
+            padding-left: 35px;
+            position: relative;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #4CAF50;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .quiz-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .quiz-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .quiz-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            min-width: 100px;
+        }
+
+        .quiz-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .question-card {
+            background: white;
+            color: #333;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-number {
+            background: #4CAF50;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            gap: 8px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            background: #e7f3ff;
+            border-color: #4CAF50;
+        }
+
+        .option.selected {
+            background: #4CAF50;
+            color: white;
+            border-color: #45a049;
+        }
+
+        .option.correct {
+            background: #4CAF50;
+            color: white;
+            border-color: #45a049;
+        }
+
+        .option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #da190b;
+        }
+
+        .quiz-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .next-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover:not(:disabled) {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .next-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .score-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .activity-section {
+            background: #fff3cd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .activity-title {
+            color: #856404;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .final-score {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3em;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 8px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .header p {
+                font-size: 0.9em;
+            }
+
+            .lesson-selector {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .lesson-btn {
+                width: 100%;
+                max-width: 250px;
+                padding: 10px 15px;
+                font-size: 0.95em;
+            }
+
+            .quiz-controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .quiz-btn {
+                width: 100%;
+                max-width: 180px;
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            .canvas-container {
+                padding: 5px;
+            }
+
+            .tools {
+                gap: 6px;
+                justify-content: center;
+            }
+
+            button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+                min-width: 70px;
+            }
+
+            .protractor, .ruler {
+                width: 120px;
+                height: 120px;
+            }
+
+            .ruler {
+                height: 20px;
+            }
+
+            .center-handle {
+                width: 20px;
+                height: 20px;
+            }
+
+            .lesson-title {
+                font-size: 1.4em;
+            }
+
+            .procedure-section {
+                padding: 10px;
+            }
+
+            .steps li {
+                font-size: 0.9em;
+                padding-left: 30px;
+            }
+
+            .steps li::before {
+                width: 20px;
+                height: 20px;
+                font-size: 0.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.3em;
+            }
+
+            .header p {
+                font-size: 0.85em;
+            }
+
+            .lesson-btn {
+                max-width: 200px;
+                font-size: 0.9em;
+            }
+
+            .quiz-btn {
+                max-width: 160px;
+                font-size: 0.85em;
+            }
+
+            .tools {
+                gap: 5px;
+            }
+
+            button {
+                padding: 8px 12px;
+                font-size: 0.85em;
+                min-width: 60px;
+            }
+
+            .instructions {
+                font-size: 0.8em;
+            }
+
+            .protractor, .ruler {
+                width: 100px;
+                height: 100px;
+            }
+
+            .ruler {
+                height: 18px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+ 
